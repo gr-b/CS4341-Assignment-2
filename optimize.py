@@ -10,21 +10,51 @@ def getFromFile(filename):
     return nums
 
 # Randomly assign the numbers in the given list to buckets
-def putInBuckets(numbers):
-    buckets = [[],[],[]]
+def putInBins(numbers):
+    bins = [[],[],[]]
     i = 0
     while len(numbers) > 0:
         selection = random.randint(0,len(numbers)-1)
         #print( i%3, selection, len(numbers))
-        buckets[i % 3].append(numbers[selection])
+        bins[i % 3].append(numbers[selection])
         numbers.pop(selection)
         i += 1
-    return buckets
+    return bins
 
-def printBuckets(buckets):
-    for i in range(len(buckets)):
-        print("Bucket " + str(i) + ":", buckets[i])
-    
+def printBins(bins):
+    for i in range(len(bins)):
+        print("Bin " + str(i) + ":", bins[i])
+
+def scoreBins(bins):
+    # First bin
+    # Score: alternately add and subtract values
+    score0 = 0
+    i = 0
+    for item in bins[0]:
+        if i % 2:
+            score0 += item
+        else:
+            score0 -= item
+        i += 1
+
+    score1 = 0
+    # If value of i+1 > i, +3. if i+1==i, +5. if i+1 < i, -10
+    for index in range(len(bins[1])-1):
+        i = bins[1][index]
+        iplus1 = bins[1][index+1]
+        
+        if  iplus1 > i:
+            score1 += 3
+        elif iplus1 == i:
+            score1 += 5
+        elif iplus1 < i:
+            score1 -= 10
+
+    score2 = 0
+    #
+
+    return (score0, score1, score2)
+
 def main():
     arguments = sys.argv
 
@@ -38,8 +68,8 @@ def main():
 
     nums = getFromFile(filename)
     #print(nums)
-    buckets = putInBuckets(nums)
-    printBuckets(buckets)
+    bins = putInBins(nums)
+    printBins(bins)
 
 
 if __name__ == '__main__':
