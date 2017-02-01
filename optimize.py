@@ -24,7 +24,8 @@ def putInBins(numbers):
 
 def printBins(bins):
     for i in range(len(bins)):
-        print("Bin " + str(i+1) + ":", bins[i])
+        print("Bin " + str(i+1) + ":", bins[i], "-->",
+              str(eval("scoreBin" + str(i+1) + "(bins[i])")))
 
 def scoreBin1(bin1):
      # First bin
@@ -83,9 +84,10 @@ def scoreBin3(bin3):
     return score
 
 def scoreBins(bins):
-   print("First bin: " + str(scoreBin1(bins[0])))
-   print("Second bin: " + str(scoreBin2(bins[1])))
-   print("Third bin: " + str(scoreBin3(bins[2])))
+   #print("First bin: " + str(scoreBin1(bins[0])))
+   #print("Second bin: " + str(scoreBin2(bins[1])))
+   #print("Third bin: " + str(scoreBin3(bins[2])))
+   return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
 
 def getAllBinScores(bins):
     """
@@ -189,7 +191,7 @@ def main():
     #print(nums)
     bins = putInBins(nums)
     printBins(bins)
-    scoreBins(bins)
+    print("Total: " + str(scoreBins(bins)))
 
     # hill climbing tests
     hillClimbing(bins)
