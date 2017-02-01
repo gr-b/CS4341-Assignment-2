@@ -50,6 +50,7 @@ Temporary Items
 # User-specific stuff:
 .idea/workspace.xml
 .idea/tasks.xml
+.idea/vsc.xml
 
 # Sensitive or high-churn files:
 .idea/dataSources/
