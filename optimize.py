@@ -1,7 +1,7 @@
 # File: optimize.py
 # Griffin Bishop, David Deisde, Gianluca Tarquinio, Ian Vossoughi
 
-import sys, random
+import sys, random, math
 from random import randint
 import copy
 import time
@@ -230,11 +230,14 @@ def hillClimbing(numbers, timeLimit):
             bestSolution = copy.deepcopy(bins)
     return bestSolution
     
-def tryMove(newScore, oldScore, temperature): #placeholder implementation
-    return newScore > oldScore
-    
+def tryMove(newScore, oldScore, temperature):
+    if(newScore > oldScore):
+        return True
+    else:
+        return math.exp(float(newScore-oldScore) / temperature)
+            
 def getNextTemp(temperature): #placeholder implementation
-    return temperature
+    return temperature * 0.2
 
 def simAnneal(numbers, timeLimit, startTemp):
     #setup
@@ -250,7 +253,7 @@ def simAnneal(numbers, timeLimit, startTemp):
             bestSolution = copy.deepcopy(bins)
         temperature = startTemp
         tries = 0
-        while(tries < 100 and time.time() - startTime < timeLimit):
+        while(tries < 100 and temperature > 0 and time.time() - startTime < timeLimit): #this restart condition is subject to change
             #pick two random locations
             locations = [] #[first_bin, first_bin_index, second_bin, second_bin_index]
             locations.append(random.randrange(0, 3))
@@ -267,14 +270,15 @@ def simAnneal(numbers, timeLimit, startTemp):
             
             #try to make the move
             if(tryMove(score, currentScore, temperature)):
-                #if it works, reset tries, update currentScore, and update temperature
+                #if it works, reset tries, update currentScore
                 tries = 0
                 currentScore = score
-                temperature = getNextTemp(temperature)
             else:
                 #if it fails, swap it back and increment tries
                 swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
                 tries += 1
+            #Update temperature
+            temperature = getNextTemp(temperature)
         #if the new solution is better that the old best solution, replace the old best    
         if(currentScore > scoreBins(bestSolution)):
             bestSolution = copy.deepcopy(bins)
