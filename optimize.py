@@ -85,6 +85,7 @@ def scoreBins(bins):
    print("First bin: " + str(scoreBin1(bins[0])))
    print("Second bin: " + str(scoreBin2(bins[1])))
    print("Third bin: " + str(scoreBin3(bins[2])))
+   return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
 
 def main():
     arguments = sys.argv
@@ -101,7 +102,7 @@ def main():
     #print(nums)
     bins = putInBins(nums)
     printBins(bins)
-    scoreBins(bins)
+    print("Total: " + str(scoreBins(bins)))
 
 if __name__ == '__main__':
     main()
