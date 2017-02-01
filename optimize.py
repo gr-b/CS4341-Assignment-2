@@ -25,35 +25,37 @@ def printBins(bins):
     for i in range(len(bins)):
         print("Bin " + str(i) + ":", bins[i])
 
-def scoreBins(bins):
-    # First bin
+def scoreBin1(bin1):
+     # First bin
     # Score: alternately add and subtract values
-    score0 = 0
+    score = 0
     i = 0
-    for item in bins[0]:
-        if i % 2:
-            score0 += item
+    for item in bin1:
+        if not i % 2:
+            score += item
         else:
-            score0 -= item
+            score -= item
         i += 1
+    return score
 
-    score1 = 0
+def scoreBin2(bin2):
+    score = 0
     # If value of i+1 > i, +3. if i+1==i, +5. if i+1 < i, -10
-    for index in range(len(bins[1])-1):
-        i = bins[1][index]
-        iplus1 = bins[1][index+1]
+    for index in range(len(bin2)-1):
+        i = bin2[index]
+        iplus1 = bin2[index+1]
         
         if  iplus1 > i:
-            score1 += 3
+            score += 3
         elif iplus1 == i:
-            score1 += 5
+            score += 5
         elif iplus1 < i:
-            score1 -= 10
+            score -= 10
+    return score
 
-    score2 = 0
-    #
-
-    return (score0, score1, score2)
+def scoreBins(bins):
+   print("First bin: " + str(scoreBin1(bins[0])))
+   print("Second bin: " + str(scoreBin2(bins[1])))
 
 def main():
     arguments = sys.argv
@@ -70,7 +72,7 @@ def main():
     #print(nums)
     bins = putInBins(nums)
     printBins(bins)
-
+    scoreBins(bins)
 
 if __name__ == '__main__':
     main()
