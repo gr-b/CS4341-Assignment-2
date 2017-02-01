@@ -1,7 +1,10 @@
 # File: optimize.py
 # Griffin Bishop, David Deisde, Gianluca Tarquinio, Ian Vossoughi
 
-import sys, random
+import random
+import sys
+import math
+
 
 def getFromFile(filename):
     file = open(filename,"r")
@@ -52,6 +55,9 @@ def scoreBin2(bin2):
         elif iplus1 < i:
             score -= 10
     return score
+
+def isPrime(num):
+    return num in [2, 3, 5, 7]
 
 def scoreBins(bins):
    print("First bin: " + str(scoreBin1(bins[0])))
