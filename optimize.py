@@ -68,14 +68,17 @@ def scoreBin3(bin3):
         else:
             score += -bin3[i]
         #print("First half: " + str(i) + ":" + str(bin3[i]) + ":Score:" + str(score-oldscore))
-    for i in range(middle, len(bin3)):
+    if middle % 2 == 0:
+        middle -= 1
+    for i in range(middle+1, len(bin3)):
+        oldscore = score
         if isPrime(bin3[i]):
             score += -4
         elif bin3[i] < 0:
             score += 2
         else:
             score += bin3[i]
-        #print(i)
+        #print("second half: " + str(i) + ":" + str(bin3[i]) + ":Score:" + str(score-oldscore))
     return score
 
 def scoreBins(bins):
