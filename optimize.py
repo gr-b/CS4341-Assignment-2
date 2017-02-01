@@ -60,21 +60,22 @@ def scoreBin3(bin3):
     score = 0
     middle = int(len(bin3)/2)
     for i in range(middle):
-        if isPrime(i):
+        oldscore = score
+        if isPrime(bin3[i]):
             score += 4
         elif i < 0:
             score += -2
         else:
-            score += -i
-        print(i)
+            score += -bin3[i]
+        #print("First half: " + str(i) + ":" + str(bin3[i]) + ":Score:" + str(score-oldscore))
     for i in range(middle, len(bin3)):
-        if isPrime(i):
+        if isPrime(bin3[i]):
             score += -4
-        elif i < 0:
+        elif bin3[i] < 0:
             score += 2
         else:
-            score += i
-        print(i)
+            score += bin3[i]
+        #print(i)
     return score
 
 def scoreBins(bins):
