@@ -183,6 +183,62 @@ def hillClimbing(bins, numbers, time_limit, max_tries=100):
 
     return best_solution_bins
 
+def swap(bin1, idx1, bin2, idx2):
+    temp = bin1[idx1]
+    bin1[idx1] = bin2[idx2]
+    bin2[idx2] = temp
+    
+def tryMove(newScore, oldScore, temperature): #placeholder implementation
+    return newScore > oldScore
+    
+def getNextTemp(temperature): #placeholder implementation
+    return temperature
+
+def simAnneal(numbers, timeLimit, startTemp):
+    #setup
+    startTime = time.time()
+    bestSolution = None
+    length = len(numbers) / 3
+    temperature = startTemp
+    #keep searching for solution while there is time last
+    while(time.time() - startTime < timeLimit):
+        #randomly fill bins
+        bins = putInBins(numbers)
+        currentScore = scoreBins(bins)
+        if(bestSolution == None):
+            bestSolution = copy.deepcopy(bins)
+        tries = 0
+        while(tries < 100 and time.time() - startTime < timeLimit):
+            #pick two random locations
+            locations = [] #[first_bin, first_bin_index, second_bin, second_bin_index]
+            locations.append(random.randrange(0, 3))
+            locations.append(random.randrange(0, length))
+            locations.append(random.randrange(0, 3))
+            locations.append(random.randrange(0, length))
+            while(time.time() - startTime < timeLimit and locations[0] == locations[2] and locations[1] == locations[3]):
+                locations[2] = random.randrange(0, 3)
+                locations[3] = random.randrange(0, length)
+            
+            #make a swap and get new score
+            swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
+            score = scoreBins(bins)
+            
+            #try to make the move
+            if(tryMove(score, currentScore, temperature)):
+                #if it works, reset tries, update currentScore, and update temperature
+                tries = 0
+                currentScore = score
+                temperature = getNextTemp(temperature)
+            else:
+                #if it fails, swap it back and increment tries
+                swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
+                tries += 1
+        #if the new solution is better that the old best solution, replace the old best    
+        if(currentScore > scoreBins(bestSolution)):
+            bestSolution = copy.deepcopy(bins)
+    return bestSolution
+    
+        
 
 def getRandomBin(bins):
     """
@@ -219,14 +275,19 @@ def main():
     timelimit = float(arguments[3])
 
     nums = getFromFile(filename)
-
+    
     bins = putInBins(nums)
-    printBins(bins)
-    print("Total: " + str(scoreBins(bins)))
+    #printBins(bins)
+    #print("Total: " + str(scoreBins(bins)))
 
     # hill climbing tests
-    best_solution = hillClimbing(bins, nums, time_limit=timelimit)
-    print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
+    #best_solution = hillClimbing(bins, nums, time_limit=timelimit)
+    #print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
+    
+    bestSolution = simAnneal(nums, timelimit, 17)
+    #bestSolution = hillClimbing(bins, nums, time_limit=timelimit)
+    print("Score: " + str(scoreBins(bestSolution)))
+    print(bestSolution)
 
 
 if __name__ == '__main__':
