@@ -83,6 +83,15 @@ def scoreBins(bins):
    print("Second bin: " + str(scoreBin2(bins[1])))
    print("Third bin: " + str(scoreBin3(bins[2])))
 
+def hillClimbing(numbers):
+    """
+    Performs hill climbing to find best scored bins for the given numbers.
+
+    :param numbers: Input numbers passed in
+    :return: None
+    """
+    pass
+
 def main():
     arguments = sys.argv
 
