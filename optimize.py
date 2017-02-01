@@ -3,6 +3,9 @@
 
 import sys, random
 from random import randint
+import copy
+import time
+
 
 def getFromFile(filename):
     file = open(filename,"r")
@@ -11,14 +14,16 @@ def getFromFile(filename):
     return nums
 
 # Randomly assign the numbers in the given list to buckets
+# added deep copy so that original list is not deleted
 def putInBins(numbers):
     bins = [[],[],[]]
+    new_numbers = copy.deepcopy(numbers)
     i = 0
-    while len(numbers) > 0:
-        selection = random.randint(0,len(numbers)-1)
+    while len(new_numbers) > 0:
+        selection = random.randint(0,len(new_numbers)-1)
         #print( i%3, selection, len(numbers))
-        bins[i % 3].append(numbers[selection])
-        numbers.pop(selection)
+        bins[i % 3].append(new_numbers[selection])
+        new_numbers.pop(selection)
         i += 1
     return bins
 
@@ -103,54 +108,80 @@ def moveOperator():
     :return:
     """
 
-def hillClimbing(bins, max_tries=100):
+def hillClimbing(bins, numbers, time_limit, max_tries=100):
     """
     Performs hill climbing to find best scored bins for the given numbers.
 
     :param numbers: Input numbers passed in
-    :return: None
+    :param time_limit: time limit allowed for the function
+    :param max_tries: maximum moves allowed
+    :return: returns the updated bins, if any
     """
+    # record the start time for the function
+    start_time = time.time()
+
     # Bin Swapping logic: get random bin, and random value from that bin. Same for other bin, if their swap beats the best score, then make the swap
 
     best_score_individual = getAllBinScores(bins)
     best_score = sum(best_score_individual)
+    best_solution_bins = copy.deepcopy(bins)
 
     num_bins = len(bins)
-    tries = 0
 
-    while tries < max_tries:
-        # do we want to do states that we have already seen?
-        # already_seen_move = []
-        # new_bins = bins.pop(cur_i)
+    has_time = True
+    while has_time:
+        # reset the local score and reset the bins
+        tries = 0
+        best_score_local = best_score
+        bins = putInBins(numbers)
 
-        # get the two random bin indices
-        starting_bin_ind = getRandomBin(bins)
-        other_bin_ind = getRandomBin(bins)
+        while tries < max_tries:
+            # do we want to do states that we have already seen?
+            # already_seen_move = []
+            # new_bins = bins.pop(cur_i)
 
-        # get the two random bin value indices
-        starting_bin_val_ind = getRandomNumInBin(bins)
-        other_bin_val_ind = getRandomNumInBin(bins)
+            # get the two random bin indices
+            starting_bin_ind = getRandomBin(bins)
+            other_bin_ind = getRandomBin(bins)
 
-        # check to see if the same value is not selected in the same bin
-        while other_bin_ind == starting_bin_ind and starting_bin_val_ind == other_bin_val_ind:
+            # get the two random bin value indices
+            starting_bin_val_ind = getRandomNumInBin(bins)
             other_bin_val_ind = getRandomNumInBin(bins)
 
-        # make swap here
-        bins[starting_bin_ind][starting_bin_val_ind] = bins[other_bin_ind][other_bin_val_ind]
-        tries += 1
+            # check to see if the same value is not selected in the same bin
+            while other_bin_ind == starting_bin_ind and starting_bin_val_ind == other_bin_val_ind:
+                other_bin_val_ind = getRandomNumInBin(bins)
 
-        # get the current score after the swap
-        score = sum(getAllBinScores(bins))
-
-        # check the score against the best score, if the swap was successfull, finalize the change, otherwise swap back
-        if score > best_score:
-            best_score = score
-            continue
-        else:
-            # swap them back
+            # make swap here
             bins[starting_bin_ind][starting_bin_val_ind] = bins[other_bin_ind][other_bin_val_ind]
+            tries += 1
 
-    return bins
+            # get the current score after the swap
+            score = sum(getAllBinScores(bins))
+            best_score_global = sum(getAllBinScores(best_solution_bins))
+
+            # check the score against the best score, if the swap was successfull, finalize the change, otherwise swap back
+            if score > best_score_global:
+                best_score = score
+                best_solution_bins = copy.deepcopy(bins)
+            else:
+                # swap them back
+                bins[starting_bin_ind][starting_bin_val_ind] = bins[other_bin_ind][other_bin_val_ind]
+
+            # check time here
+            end_time = time.time()
+            delta_time = end_time - start_time
+
+            if delta_time >= time_limit:
+                print "time ended"
+                print "Best Score: ", best_score_global, best_solution_bins
+                print "Current score:", score, bins
+
+                has_time = False
+                break
+
+
+    return best_solution_bins
 
 
 def getRandomBin(bins):
@@ -188,13 +219,15 @@ def main():
     timelimit = float(arguments[3])
 
     nums = getFromFile(filename)
-    #print(nums)
+
     bins = putInBins(nums)
     printBins(bins)
     print("Total: " + str(scoreBins(bins)))
 
     # hill climbing tests
-    hillClimbing(bins)
+    best_solution = hillClimbing(bins, nums, time_limit=timelimit)
+    print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
+
 
 if __name__ == '__main__':
     main()
