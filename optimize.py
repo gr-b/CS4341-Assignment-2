@@ -108,85 +108,127 @@ def moveOperator():
     :return:
     """
 
-def hillClimbing(bins, numbers, time_limit, max_tries=100):
-    """
-    Performs hill climbing to find best scored bins for the given numbers.
-
-    :param numbers: Input numbers passed in
-    :param time_limit: time limit allowed for the function
-    :param max_tries: maximum moves allowed
-    :return: returns the updated bins, if any
-    """
-    # record the start time for the function
-    start_time = time.time()
-
-    # Bin Swapping logic: get random bin, and random value from that bin. Same for other bin, if their swap beats the best score, then make the swap
-
-    best_score_individual = getAllBinScores(bins)
-    best_score = sum(best_score_individual)
-    best_solution_bins = copy.deepcopy(bins)
-
-    num_bins = len(bins)
-
-    has_time = True
-    while has_time:
-        # reset the local score and reset the bins
-        tries = 0
-        best_score_local = best_score
-        bins = putInBins(numbers)
-
-        while tries < max_tries:
-            # do we want to do states that we have already seen?
-            # already_seen_move = []
-            # new_bins = bins.pop(cur_i)
-
-            # get the two random bin indices
-            starting_bin_ind = getRandomBin(bins)
-            other_bin_ind = getRandomBin(bins)
-
-            # get the two random bin value indices
-            starting_bin_val_ind = getRandomNumInBin(bins)
-            other_bin_val_ind = getRandomNumInBin(bins)
-
-            # check to see if the same value is not selected in the same bin
-            while other_bin_ind == starting_bin_ind and starting_bin_val_ind == other_bin_val_ind:
-                other_bin_val_ind = getRandomNumInBin(bins)
-
-            # make swap here
-            bins[starting_bin_ind][starting_bin_val_ind] = bins[other_bin_ind][other_bin_val_ind]
-            tries += 1
-
-            # get the current score after the swap
-            score = sum(getAllBinScores(bins))
-            best_score_global = sum(getAllBinScores(best_solution_bins))
-
-            # check the score against the best score, if the swap was successfull, finalize the change, otherwise swap back
-            if score > best_score_global:
-                best_score = score
-                best_solution_bins = copy.deepcopy(bins)
-            else:
-                # swap them back
-                bins[starting_bin_ind][starting_bin_val_ind] = bins[other_bin_ind][other_bin_val_ind]
-
-            # check time here
-            end_time = time.time()
-            delta_time = end_time - start_time
-
-            if delta_time >= time_limit:
-                print "time ended"
-                print "Best Score: ", best_score_global, best_solution_bins
-                print "Current score:", score, bins
-
-                has_time = False
-                break
-
-
-    return best_solution_bins
+# def hillClimbing(bins, numbers, time_limit, max_tries=100):
+#     """
+#     Performs hill climbing to find best scored bins for the given numbers.
+#
+#     :param numbers: Input numbers passed in
+#     :param time_limit: time limit allowed for the function
+#     :param max_tries: maximum moves allowed
+#     :return: returns the updated bins, if any
+#     """
+#     # record the start time for the function
+#     start_time = time.time()
+#
+#     # Bin Swapping logic: get random bin, and random value from that bin. Same for other bin, if their swap beats the best score, then make the swap
+#
+#     best_score_individual = getAllBinScores(bins)
+#     best_score = sum(best_score_individual)
+#     best_solution_bins = copy.deepcopy(bins)
+#
+#     num_bins = len(bins)
+#
+#     has_time = True
+#     while has_time:
+#         # reset the local score and reset the bins
+#         tries = 0
+#         best_score_local = best_score
+#         bins = putInBins(numbers)
+#
+#         while tries < max_tries:
+#             # do we want to do states that we have already seen?
+#             # already_seen_move = []
+#             # new_bins = bins.pop(cur_i)
+#
+#             # get the two random bin indices
+#             starting_bin_ind = getRandomBin(bins)
+#             other_bin_ind = getRandomBin(bins)
+#
+#             # get the two random bin value indices
+#             starting_bin_val_ind = getRandomNumInBin(bins)
+#             other_bin_val_ind = getRandomNumInBin(bins)
+#
+#             # check to see if the same value is not selected in the same bin
+#             while other_bin_ind == starting_bin_ind and starting_bin_val_ind == other_bin_val_ind:
+#                 other_bin_val_ind = getRandomNumInBin(bins)
+#
+#             # make swap here
+#             bins[starting_bin_ind][starting_bin_val_ind] = bins[other_bin_ind][other_bin_val_ind]
+#             tries += 1
+#
+#             # get the current score after the swap
+#             score = sum(getAllBinScores(bins))
+#             best_score_global = sum(getAllBinScores(best_solution_bins))
+#
+#             # check the score against the best score, if the swap was successfull, finalize the change, otherwise swap back
+#             if score > best_score_global:
+#                 best_score = score
+#                 best_solution_bins = copy.deepcopy(bins)
+#             else:
+#                 # swap them back
+#                 bins[starting_bin_ind][starting_bin_val_ind] = bins[other_bin_ind][other_bin_val_ind]
+#
+#             # check time here
+#             end_time = time.time()
+#             delta_time = end_time - start_time
+#
+#             if delta_time >= time_limit:
+#                 print "time ended"
+#                 print "Best Score: ", best_score_global, best_solution_bins
+#                 print "Current score:", score, bins
+#
+#                 has_time = False
+#                 break
+#
+#
+#     return best_solution_bins
 
 def swap(bin1, idx1, bin2, idx2):
     temp = bin1[idx1]
     bin1[idx1] = bin2[idx2]
     bin2[idx2] = temp
+
+def hillClimbing(numbers, timeLimit):
+    #setup
+    startTime = time.time()
+    bestSolution = None
+    length = len(numbers) / 3
+    #keep searching for solution while there is time last
+    while(time.time() - startTime < timeLimit):
+        #randomly fill bins
+        bins = putInBins(numbers)
+        currentScore = scoreBins(bins)
+        if(bestSolution == None):
+            bestSolution = copy.deepcopy(bins)
+        tries = 0
+        while(tries < 100 and time.time() - startTime < timeLimit):
+            #pick two random locations
+            locations = [] #[first_bin, first_bin_index, second_bin, second_bin_index]
+            locations.append(random.randrange(0, 3))
+            locations.append(random.randrange(0, length))
+            locations.append(random.randrange(0, 3))
+            locations.append(random.randrange(0, length))
+            while(time.time() - startTime < timeLimit and locations[0] == locations[2] and locations[1] == locations[3]):
+                locations[2] = random.randrange(0, 3)
+                locations[3] = random.randrange(0, length)
+            
+            #make a swap and get new score
+            swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
+            score = scoreBins(bins)
+            
+            #check that move is an improvement
+            if(score > currentScore):
+                #if it is, reset tries, update currentScore, and update temperature
+                tries = 0
+                currentScore = score
+            else:
+                #if it isn't, swap it back and increment tries
+                swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
+                tries += 1
+        #if the new solution is better that the old best solution, replace the old best    
+        if(currentScore > scoreBins(bestSolution)):
+            bestSolution = copy.deepcopy(bins)
+    return bestSolution
     
 def tryMove(newScore, oldScore, temperature): #placeholder implementation
     return newScore > oldScore
@@ -199,7 +241,6 @@ def simAnneal(numbers, timeLimit, startTemp):
     startTime = time.time()
     bestSolution = None
     length = len(numbers) / 3
-    temperature = startTemp
     #keep searching for solution while there is time last
     while(time.time() - startTime < timeLimit):
         #randomly fill bins
@@ -207,6 +248,7 @@ def simAnneal(numbers, timeLimit, startTemp):
         currentScore = scoreBins(bins)
         if(bestSolution == None):
             bestSolution = copy.deepcopy(bins)
+        temperature = startTemp
         tries = 0
         while(tries < 100 and time.time() - startTime < timeLimit):
             #pick two random locations
@@ -285,7 +327,7 @@ def main():
     #print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
     
     bestSolution = simAnneal(nums, timelimit, 17)
-    #bestSolution = hillClimbing(bins, nums, time_limit=timelimit)
+    #bestSolution = hillClimbing(nums, timelimit)
     print("Score: " + str(scoreBins(bestSolution)))
     print(bestSolution)
 
