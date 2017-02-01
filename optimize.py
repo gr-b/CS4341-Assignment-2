@@ -1,10 +1,7 @@
 # File: optimize.py
 # Griffin Bishop, David Deisde, Gianluca Tarquinio, Ian Vossoughi
 
-import random
-import sys
-import math
-
+import sys, random
 
 def getFromFile(filename):
     file = open(filename,"r")
@@ -26,7 +23,7 @@ def putInBins(numbers):
 
 def printBins(bins):
     for i in range(len(bins)):
-        print("Bin " + str(i) + ":", bins[i])
+        print("Bin " + str(i+1) + ":", bins[i])
 
 def scoreBin1(bin1):
      # First bin
@@ -56,12 +53,34 @@ def scoreBin2(bin2):
             score -= 10
     return score
 
-def isPrime(num):
-    return num in [2, 3, 5, 7]
+def isPrime(i):
+    return i in [2, 3, 5, 7]
+
+def scoreBin3(bin3):
+    score = 0
+    middle = int(len(bin3)/2)
+    for i in range(middle):
+        if isPrime(i):
+            score += 4
+        elif i < 0:
+            score += -2
+        else:
+            score += -i
+        print(i)
+    for i in range(middle, len(bin3)):
+        if isPrime(i):
+            score += -4
+        elif i < 0:
+            score += 2
+        else:
+            score += i
+        print(i)
+    return score
 
 def scoreBins(bins):
    print("First bin: " + str(scoreBin1(bins[0])))
    print("Second bin: " + str(scoreBin2(bins[1])))
+   print("Third bin: " + str(scoreBin3(bins[2])))
 
 def main():
     arguments = sys.argv
