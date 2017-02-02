@@ -236,10 +236,10 @@ def tryMove(newScore, oldScore, temperature):
     else:
         return math.exp(float(newScore-oldScore) / temperature)
             
-def getNextTemp(temperature): #placeholder implementation
-    return temperature * 0.2
+def getTemp(time): #placeholder implementation
+    return math.pow(0.2, time)
 
-def simAnneal(numbers, timeLimit, startTemp):
+def simAnneal(numbers, timeLimit):
     #setup
     startTime = time.time()
     bestSolution = None
@@ -251,34 +251,37 @@ def simAnneal(numbers, timeLimit, startTemp):
         currentScore = scoreBins(bins)
         if(bestSolution == None):
             bestSolution = copy.deepcopy(bins)
-        temperature = startTemp
         tries = 0
-        while(tries < 100 and temperature > 0 and time.time() - startTime < timeLimit): #this restart condition is subject to change
-            #pick two random locations
-            locations = [] #[first_bin, first_bin_index, second_bin, second_bin_index]
-            locations.append(random.randrange(0, 3))
-            locations.append(random.randrange(0, length))
-            locations.append(random.randrange(0, 3))
-            locations.append(random.randrange(0, length))
-            while(time.time() - startTime < timeLimit and locations[0] == locations[2] and locations[1] == locations[3]):
-                locations[2] = random.randrange(0, 3)
-                locations[3] = random.randrange(0, length)
+        t = 1
+        temperature = getTemp(t)
+        if(t > 0):
+            while(tries < 100 and temperature > 0 and time.time() - startTime < timeLimit): #this restart condition is subject to change
+                #pick two random locations
+                locations = [] #[first_bin, first_bin_index, second_bin, second_bin_index]
+                locations.append(random.randrange(0, 3))
+                locations.append(random.randrange(0, length))
+                locations.append(random.randrange(0, 3))
+                locations.append(random.randrange(0, length))
+                while(time.time() - startTime < timeLimit and locations[0] == locations[2] and locations[1] == locations[3]):
+                    locations[2] = random.randrange(0, 3)
+                    locations[3] = random.randrange(0, length)
             
-            #make a swap and get new score
-            swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
-            score = scoreBins(bins)
-            
-            #try to make the move
-            if(tryMove(score, currentScore, temperature)):
-                #if it works, reset tries, update currentScore
-                tries = 0
-                currentScore = score
-            else:
-                #if it fails, swap it back and increment tries
+                #make a swap and get new score
                 swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
-                tries += 1
-            #Update temperature
-            temperature = getNextTemp(temperature)
+                score = scoreBins(bins)
+            
+                #try to make the move
+                if(tryMove(score, currentScore, temperature)):
+                    #if it works, reset tries, update currentScore
+                    tries = 0
+                    currentScore = score
+                else:
+                    #if it fails, swap it back and increment tries
+                    swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
+                    tries += 1
+                #Update temperature
+                t += 1
+                temperature = getTemp(t)
         #if the new solution is better that the old best solution, replace the old best    
         if(currentScore > scoreBins(bestSolution)):
             bestSolution = copy.deepcopy(bins)
@@ -330,7 +333,7 @@ def main():
     #best_solution = hillClimbing(bins, nums, time_limit=timelimit)
     #print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
     
-    bestSolution = simAnneal(nums, timelimit, 17)
+    bestSolution = simAnneal(nums, timelimit)
     #bestSolution = hillClimbing(nums, timelimit)
     print("Score: " + str(scoreBins(bestSolution)))
     print(bestSolution)
