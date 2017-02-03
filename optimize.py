@@ -234,7 +234,8 @@ def tryMove(newScore, oldScore, temperature):
     if(newScore > oldScore):
         return True
     else:
-        return math.exp(float(newScore-oldScore) / temperature)
+        prob = math.exp(float(newScore-oldScore) / temperature)
+        return random.random() < prob;
             
 def getTemp(time): #placeholder implementation
     return math.pow(0.2, time)
