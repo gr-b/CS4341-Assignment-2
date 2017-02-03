@@ -120,6 +120,9 @@ class Organism(object):
         self.bins = bins
         self.score = score
 
+# Given 2 
+def mate(
+
 
 def getAllBinScores(bins):
     """
