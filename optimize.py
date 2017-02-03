@@ -1,7 +1,7 @@
 # File: optimize.py
 # Griffin Bishop, David Deisde, Gianluca Tarquinio, Ian Vossoughi
 
-import sys, random, math
+import sys, random, math, operator
 from random import randint
 import copy
 import time
@@ -89,10 +89,29 @@ def scoreBin3(bin3):
     return score
 
 def scoreBins(bins):
-   #print("First bin: " + str(scoreBin1(bins[0])))
-   #print("Second bin: " + str(scoreBin2(bins[1])))
-   #print("Third bin: " + str(scoreBin3(bins[2])))
    return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
+
+def geneticAlgorithm(elite, popSize, nums):
+    population = []
+    for org in popSize:
+        anOrg = Organism(putInBins(nums), 0)
+        anOrg.score = scoreBins(anOrg.bins)
+        population.append(anOrg)
+    newPopulation = []
+    population.sort(key = operator.attrgetter('score'))
+    elitism = math.ceiling(elite * popSize)
+    i = 0
+    while (i < elitism) and (i < population.len()):
+        newPopulation[i] =  population[i]
+        i += 1
+
+
+
+class Organism(object):
+    def __init__(self, bins, score):
+        self.bins = bins
+        self.score = score
+
 
 def getAllBinScores(bins):
     """
@@ -130,11 +149,11 @@ def hillClimbing(numbers, timeLimit):
             while(time.time() - startTime < timeLimit and locations[0] == locations[2] and locations[1] == locations[3]):
                 locations[2] = random.randrange(0, 3)
                 locations[3] = random.randrange(0, length)
-            
+
             #make a swap and get new score
             swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
             score = scoreBins(bins)
-            
+
             #check that move is an improvement
             if(score > currentScore):
                 #if it is, reset tries, update currentScore, and update temperature
@@ -144,18 +163,18 @@ def hillClimbing(numbers, timeLimit):
                 #if it isn't, swap it back and increment tries
                 swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
                 tries += 1
-        #if the new solution is better that the old best solution, replace the old best    
+        #if the new solution is better that the old best solution, replace the old best
         if(currentScore > scoreBins(bestSolution)):
             bestSolution = copy.deepcopy(bins)
     return bestSolution
-    
+
 def tryMove(newScore, oldScore, temperature):
     if(newScore > oldScore):
         return True
     else:
         prob = math.exp(float(newScore-oldScore) / temperature)
         return random.random() < prob;
-            
+
 def getTemp(time): #placeholder implementation
     return math.pow(0.2, time)
 
@@ -185,11 +204,11 @@ def simAnneal(numbers, timeLimit):
                 while(time.time() - startTime < timeLimit and locations[0] == locations[2] and locations[1] == locations[3]):
                     locations[2] = random.randrange(0, 3)
                     locations[3] = random.randrange(0, length)
-            
+
                 #make a swap and get new score
                 swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
                 score = scoreBins(bins)
-            
+
                 #try to make the move
                 if(tryMove(score, currentScore, temperature)):
                     #if it works, reset tries, update currentScore
@@ -202,12 +221,12 @@ def simAnneal(numbers, timeLimit):
                 #Update temperature
                 t += 1
                 temperature = getTemp(t)
-        #if the new solution is better that the old best solution, replace the old best    
+        #if the new solution is better that the old best solution, replace the old best
         if(currentScore > scoreBins(bestSolution)):
             bestSolution = copy.deepcopy(bins)
     return bestSolution
-    
-        
+
+
 
 def getRandomBin(bins):
     """
@@ -244,7 +263,7 @@ def main():
     timelimit = float(arguments[3])
 
     nums = getFromFile(filename)
-    
+
     bins = putInBins(nums)
     #printBins(bins)
     #print("Total: " + str(scoreBins(bins)))
@@ -263,7 +282,7 @@ def main():
     else:
         print("Incorrect algorithm name given")
         exit()
-    
+
     #print(bestSolution)
     print("Score: " + str(scoreBins(bestSolution)))
 
