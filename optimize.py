@@ -115,8 +115,6 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
 
 
 
-
-
 class Organism(object):
     def __init__(self, bins, score):
         self.bins = bins
