@@ -91,8 +91,42 @@ def scoreBin3(bin3):
 def scoreBins(bins):
    return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
 
-def breedOrganisms(population, newPopulation):
-    pass
+def randomSelection(population):
+    totalFitness = 0
+    for org in population:
+        totalFitness += org.score
+    randScore = random.randrange(0, totalFitness)
+    runningFitness = 0
+    for org in population:
+        if runningFitness > randScore:
+            return org
+        else:
+            runningFitness += org.score
+
+
+def breedOrganisms(population, newPopulation, popSize):
+    while len(newPopulation) < popSize:
+        parent1 = randomSelection(population)
+        parent2 = randomSelection(population)
+        while parent2 is parent1:
+            parent2 = randomSelection(population)
+        flatList1 = [y for x in parent1.bins for y in x]
+        flatList2 = [y for x in parent2.bins for y in x]
+        cutpoint = random.randrange(0, len(flatList1))
+
+        child1List = flatList1[0:cutpoint] + flatList2[cutpoint:len(flatList2)]
+        child2List = flatList2[0:cutpoint] + flatList1[cutpoint:len(flatList1)]
+        oneThirdList = int(len(child1List) / 3)
+
+        child1Bins = [child1List[0:oneThirdList],child1List[oneThirdList:2*oneThirdList],child1List[2*oneThirdList:3*oneThirdList]]
+        child2Bins = [child2List[0:oneThirdList],child2List[oneThirdList:2*oneThirdList],child2List[2*oneThirdList:3*oneThirdList]]
+
+        child1 = Organism(child1Bins, scoreBins(child1Bins))
+        child2 = Organism(child2Bins, scoreBins(child2Bins))
+
+        newPopulation.append(child1)
+        newPopulation.append(child2)
+    return newPopulation
 
 
 def geneticAlgorithm(elite, popSize, nums, timeLimit):
@@ -108,10 +142,10 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         newPopulation = []
         population.sort(key = operator.attrgetter('score'))
         i = 0
-        while (i < elitism) and (i < population.len()):
+        while (i < elitism) and (i < len(population)):
             newPopulation[i] = population[i]
             i += 1
-        population = breedOrganisms(population, newPopulation)
+        population = breedOrganisms(population, newPopulation, popSize)
 
 
 
@@ -286,7 +320,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        print("Soon.")
+        bestSolution = geneticAlgorithm(0, 10, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
