@@ -113,15 +113,10 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         breedOrganisms(population, newPopulation)
 
 
-
-
 class Organism(object):
     def __init__(self, bins, score):
         self.bins = bins
         self.score = score
-
-# Given 2 
-def mate(
 
 
 def getAllBinScores(bins):
