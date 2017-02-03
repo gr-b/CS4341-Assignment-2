@@ -94,19 +94,27 @@ def scoreBins(bins):
    print("Third bin: " + str(scoreBin3(bins[2])))
    return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
 
-def geneticAlgorithm(elite, popSize, nums):
+def breedOrganisms(population, newPopulation):
+
+
+def geneticAlgorithm(elite, popSize, nums, timeLimit):
+    startTime = time.time()
     population = []
-    for org in popSize:
+    elitism = math.ceiling(elite * popSize)
+    for org in range(popSize):
         anOrg = Organism(putInBins(nums), 0)
         anOrg.score = scoreBins(anOrg.bins)
         population.append(anOrg)
-    newPopulation = []
-    population.sort(key = operator.attrgetter('score'))
-    elitism = math.ceiling(elite * popSize)
-    i = 0
-    while (i < elitism) and (i < population.len()):
-        newPopulation[i] =  population[i]
-        i += 1
+
+    while (time.time() - startTime < timeLimit):
+        newPopulation = []
+        population.sort(key = operator.attrgetter('score'))
+        i = 0
+        while (i < elitism) and (i < population.len()):
+            newPopulation[i] = population[i]
+            i += 1
+        breedOrganisms(population, newPopulation)
+
 
 
 
