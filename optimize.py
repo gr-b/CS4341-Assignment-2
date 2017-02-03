@@ -94,6 +94,7 @@ def scoreBins(bins):
 def breedOrganisms(population, newPopulation):
 
 
+
 def geneticAlgorithm(elite, popSize, nums, timeLimit):
     startTime = time.time()
     population = []
@@ -110,7 +111,8 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         while (i < elitism) and (i < population.len()):
             newPopulation[i] = population[i]
             i += 1
-        breedOrganisms(population, newPopulation)
+        population = breedOrganisms(population, newPopulation)
+
 
 
 
