@@ -92,7 +92,7 @@ def scoreBins(bins):
    return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
 
 def breedOrganisms(population, newPopulation):
-
+    pass
 
 def geneticAlgorithm(elite, popSize, nums, timeLimit):
     startTime = time.time()
