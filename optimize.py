@@ -89,9 +89,6 @@ def scoreBin3(bin3):
     return score
 
 def scoreBins(bins):
-   print("First bin: " + str(scoreBin1(bins[0])))
-   print("Second bin: " + str(scoreBin2(bins[1])))
-   print("Third bin: " + str(scoreBin3(bins[2])))
    return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
 
 def breedOrganisms(population, newPopulation):
@@ -284,7 +281,7 @@ def main():
     #print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
 
     bestSolution = None
-    if algorithm == "anneal":
+    if algorithm == "annealing":
         bestSolution = simAnneal(nums, timelimit)
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
@@ -292,8 +289,9 @@ def main():
         print("Soon.")
     else:
         print("Incorrect algorithm name given")
+        exit()
 
-    print(bestSolution)
+    #print(bestSolution)
     print("Score: " + str(scoreBins(bestSolution)))
 
 
