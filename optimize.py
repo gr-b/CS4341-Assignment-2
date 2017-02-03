@@ -182,7 +182,7 @@ def tryMove(newScore, oldScore, temperature):
         return random.random() < prob;
 
 def getTemp(time): #placeholder implementation
-    return math.pow(0.2, time)
+    return math.pow(0.95, time)
 
 def simAnneal(numbers, timeLimit):
     #setup
@@ -196,11 +196,10 @@ def simAnneal(numbers, timeLimit):
         currentScore = scoreBins(bins)
         if(bestSolution == None):
             bestSolution = copy.deepcopy(bins)
-        tries = 0
         t = 1
         temperature = getTemp(t)
         if(t > 0):
-            while(tries < 100 and temperature > 0 and time.time() - startTime < timeLimit): #this restart condition is subject to change
+            while(time.time() - startTime < timeLimit and temperature > 0): #this restart condition is subject to change
                 #pick two random locations
                 locations = [] #[first_bin, first_bin_index, second_bin, second_bin_index]
                 locations.append(random.randrange(0, 3))
@@ -217,13 +216,11 @@ def simAnneal(numbers, timeLimit):
 
                 #try to make the move
                 if(tryMove(score, currentScore, temperature)):
-                    #if it works, reset tries, update currentScore
-                    tries = 0
+                    #if it works, update currentScore
                     currentScore = score
                 else:
-                    #if it fails, swap it back and increment tries
+                    #if it fails, swap it back
                     swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
-                    tries += 1
                 #Update temperature
                 t += 1
                 temperature = getTemp(t)
