@@ -332,11 +332,19 @@ def main():
     # hill climbing tests
     #best_solution = hillClimbing(bins, nums, time_limit=timelimit)
     #print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
-    
-    bestSolution = simAnneal(nums, timelimit)
-    #bestSolution = hillClimbing(nums, timelimit)
-    print("Score: " + str(scoreBins(bestSolution)))
+
+    bestSolution = None
+    if algorithm == "anneal":
+        bestSolution = simAnneal(nums, timelimit)
+    elif algorithm == "hill":
+        bestSolution = hillClimbing(nums, timelimit)
+    elif algorithm == "ga":
+        print("Soon.")
+    else:
+        print("Incorrect algorithm name given")
+
     print(bestSolution)
+    print("Score: " + str(scoreBins(bestSolution)))
 
 
 if __name__ == '__main__':
