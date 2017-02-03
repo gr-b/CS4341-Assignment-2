@@ -92,19 +92,30 @@ def scoreBins(bins):
    return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
 
 def randomSelection(population):
+    popCopy = copy.deepcopy(population)
+    minScore = abs(popCopy[-1].score)+1
+    print("Random selection's list")
+    for org in popCopy:
+        org.score += minScore
+        print(org.score)
+
     totalFitness = 0
-    for org in population:
+    for org in popCopy:
         totalFitness += org.score
     randScore = random.randrange(0, totalFitness)
+    print("Total fitness: " + str(totalFitness))
+    print("Random number: " + str(randScore))
     runningFitness = 0
-    for org in population:
-        if runningFitness > randScore:
+    for org in popCopy:
+        if org.score >= randScore:
+            print("Chose organism with score " + str(org.score))
+            org.score -= minScore
             return org
         else:
-            runningFitness += org.score
+            randScore -= org.score
 
 
-def breedOrganisms(population, newPopulation, popSize):
+def breedOrganisms(population, newPopulation, popSize, nums):
     while len(newPopulation) < popSize:
         parent1 = randomSelection(population)
         parent2 = randomSelection(population)
@@ -116,6 +127,38 @@ def breedOrganisms(population, newPopulation, popSize):
 
         child1List = flatList1[0:cutpoint] + flatList2[cutpoint:len(flatList2)]
         child2List = flatList2[0:cutpoint] + flatList1[cutpoint:len(flatList1)]
+
+        numFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        child1Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        child2Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for item in nums:
+            numFrequency[item+10] += 1
+        for item in child1List:
+            child1Frequency[item+10] += 1
+        for item in child2List:
+            child2Frequency[item+10] += 1
+        i = 0
+        while i < 20:
+            child1Frequency[i] -= numFrequency[i]
+            child2Frequency[i] -= numFrequency[i]
+            i += 1
+        print("Child 1 frequency: ")
+        print child1Frequency
+        print("Child 2 frequency: ")
+        print child2Frequency
+        i = 0
+        while i < 20:
+            if child1Frequency[i] > 0:
+                replaceNum = i + 10
+                for num in child1List:
+                    if num == replaceNum:
+                        pass
+            i += 1
+        print("Child 1 frequency: ")
+        print child1Frequency
+        print("Child 2 frequency: ")
+        print child2Frequency
+
         oneThirdList = int(len(child1List) / 3)
 
         child1Bins = [child1List[0:oneThirdList],child1List[oneThirdList:2*oneThirdList],child1List[2*oneThirdList:3*oneThirdList]]
@@ -123,6 +166,20 @@ def breedOrganisms(population, newPopulation, popSize):
 
         child1 = Organism(child1Bins, scoreBins(child1Bins))
         child2 = Organism(child2Bins, scoreBins(child2Bins))
+        child1.mutation(0.1)
+        child2.mutation(0.1)
+
+        print("Parent 1: ")
+        print(parent1.bins)
+        print("Parent 2: ")
+        print(parent2.bins)
+        print("Child 1: ")
+        print(child1.bins)
+        print("Child 2: ")
+        print(child2.bins)
+
+
+
 
         newPopulation.append(child1)
         newPopulation.append(child2)
@@ -132,7 +189,7 @@ def breedOrganisms(population, newPopulation, popSize):
 def geneticAlgorithm(elite, popSize, nums, timeLimit):
     startTime = time.time()
     population = []
-    elitism = math.ceiling(elite * popSize)
+    elitism = math.ceil(elite * popSize)
     for org in range(popSize):
         anOrg = Organism(putInBins(nums), 0)
         anOrg.score = scoreBins(anOrg.bins)
@@ -141,11 +198,18 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
     while (time.time() - startTime < timeLimit):
         newPopulation = []
         population.sort(key = operator.attrgetter('score'))
+        population.reverse()
+        for org in population:
+            print(org.score)
         i = 0
         while (i < elitism) and (i < len(population)):
             newPopulation[i] = population[i]
             i += 1
-        population = breedOrganisms(population, newPopulation, popSize)
+        print("Population list (pre-breeding):")
+        for org in population:
+            print(org.score)
+        population = breedOrganisms(population, newPopulation, popSize, nums)
+    return population[0].bins
 
 
 
@@ -173,7 +237,7 @@ class Organism(object):
         bin_length = len(self.bins[0])
         num_bins = 3
 
-        random_bin = random.randint(1, 3)
+        random_bin = random.randint(0, 2)
         random_index = random.randint(0,bin_length-1)
 
         random_number_replacement = random.randint(-9, -9)
@@ -348,7 +412,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0, 10, nums, timelimit)
+        bestSolution = geneticAlgorithm(0, 6, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
