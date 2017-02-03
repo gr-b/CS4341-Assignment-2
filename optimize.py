@@ -254,7 +254,7 @@ def main():
     #print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
 
     bestSolution = None
-    if algorithm == "anneal":
+    if algorithm == "annealing":
         bestSolution = simAnneal(nums, timelimit)
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
@@ -262,8 +262,9 @@ def main():
         print("Soon.")
     else:
         print("Incorrect algorithm name given")
+        exit()
     
-    print(bestSolution)
+    #print(bestSolution)
     print("Score: " + str(scoreBins(bestSolution)))
 
 
