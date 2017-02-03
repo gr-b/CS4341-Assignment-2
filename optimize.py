@@ -108,12 +108,43 @@ def geneticAlgorithm(elite, popSize, nums):
         newPopulation[i] =  population[i]
         i += 1
 
-
+# randomly mutates, random swap between bins. Once you change anything in the organism, recalculate the score for it
 
 class Organism(object):
     def __init__(self, bins, score):
         self.bins = bins
         self.score = score
+
+    def mutation(self, mutationProbability):
+        """
+        Mutation does random swaps between bins, similar to hill climbing
+
+        :param mutation: the probability for the mutation
+        :return: True/False if the mutation succeeded
+        """
+        ## if random variable is less than the mutationProbability, then grab a random number from a random bin
+        ## if the random variable is not less, dont do anything
+
+        # determine if the mutation can be moved
+        random_probability = random.random()
+        if not random_probability < mutationProbability:
+            return False
+
+        # now grab a random index in a random bin, and pick a random value from -9 to -9
+        bin_length = len(self.bins[0])
+        num_bins = 3
+
+        random_bin = random.randint(1, 3)
+        random_index = random.randint(0,bin_length-1)
+
+        random_number_replacement = random.randint(-9, -9)
+
+        bin_to_change = self.bins[random_bin]
+
+        # add in the random number
+        bin_to_change[random_index] = random_number_replacement
+
+        return True
 
 
 def getAllBinScores(bins):
