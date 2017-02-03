@@ -312,10 +312,10 @@ def tryMove(newScore, oldScore, temperature):
         prob = math.exp(float(newScore-oldScore) / temperature)
         return random.random() < prob;
 
-def getTemp(time): #placeholder implementation
-    return math.pow(0.95, time)
+def getTemp(time, decreaseFactor): #placeholder implementation
+    return math.pow(decreaseFactor, time)
 
-def simAnneal(numbers, timeLimit):
+def simAnneal(numbers, timeLimit, decreaseFactor):
     #setup
     startTime = time.time()
     bestSolution = None
@@ -328,7 +328,7 @@ def simAnneal(numbers, timeLimit):
         if(bestSolution == None):
             bestSolution = copy.deepcopy(bins)
         t = 1
-        temperature = getTemp(t)
+        temperature = getTemp(t, decreaseFactor)
         if(t > 0):
             while(time.time() - startTime < timeLimit and temperature > 0): #this restart condition is subject to change
                 #pick two random locations
@@ -354,7 +354,7 @@ def simAnneal(numbers, timeLimit):
                     swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
                 #Update temperature
                 t += 1
-                temperature = getTemp(t)
+                temperature = getTemp(t, decreaseFactor)
         #if the new solution is better that the old best solution, replace the old best
         if(currentScore > scoreBins(bestSolution)):
             bestSolution = copy.deepcopy(bins)
@@ -384,13 +384,20 @@ def getRandomNumInBin(bins):
     # val = bin[rand_int]
     return index
 
+def trial(nums, timelimit, min, max):
+    factor = min
+    step = (max-min)/10
+    while(factor <= max):
+        print("Factor: " + str(factor) + " Score: " + str(scoreBins(simAnneal(nums, timelimit, factor))))
+        factor += step
 
 def main():
     arguments = sys.argv
 
     if len(arguments) != 4:
-        print("Invalid Format, try: python optimize.py [hill, annealing, ga] [filename.txt] [seconds]")
+        #print("Invalid Format, try: python optimize.py [hill, annealing, ga] [filename.txt] [seconds]")
         #exit()
+        pass
 
     algorithm = arguments[1]
     filename = arguments[2]
@@ -408,7 +415,8 @@ def main():
 
     bestSolution = None
     if algorithm == "annealing":
-        bestSolution = simAnneal(nums, timelimit)
+        #bestSolution = simAnneal(nums, timelimit, 0.95)
+        trial(nums, timelimit, float(arguments[4]), float(arguments[5]))
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
@@ -418,7 +426,7 @@ def main():
         exit()
 
     #print(bestSolution)
-    print("Score: " + str(scoreBins(bestSolution)))
+    #print("Score: " + str(scoreBins(bestSolution)))
 
 
 if __name__ == '__main__':
