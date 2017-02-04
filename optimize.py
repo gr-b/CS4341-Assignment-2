@@ -182,20 +182,20 @@ def breedOrganisms(population, newPopulation, popSize, nums):
                 child2List[j] = tooFewList2.pop()
                 tooManyList2.remove(item)
 
-        numFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        child1Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        child2Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        for item in nums:
-            numFrequency[item+10] += 1
-        for item in child1List:
-            child1Frequency[item+10] += 1
-        for item in child2List:
-            child2Frequency[item+10] += 1
-        i = 0
-        while i < 20:
-            child1Frequency[i] -= numFrequency[i]
-            child2Frequency[i] -= numFrequency[i]
-            i += 1
+        # numFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # child1Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # child2Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # for item in nums:
+        #     numFrequency[item+10] += 1
+        # for item in child1List:
+        #     child1Frequency[item+10] += 1
+        # for item in child2List:
+        #     child2Frequency[item+10] += 1
+        # i = 0
+        # while i < 20:
+        #     child1Frequency[i] -= numFrequency[i]
+        #     child2Frequency[i] -= numFrequency[i]
+        #     i += 1
 
         #print("Child 1 frequency: ")
         #print(child1Frequency)
@@ -209,8 +209,8 @@ def breedOrganisms(population, newPopulation, popSize, nums):
 
         child1 = Organism(child1Bins, scoreBins(child1Bins))
         child2 = Organism(child2Bins, scoreBins(child2Bins))
-        child1.mutation(0.5)
-        child2.mutation(0.5)
+        child1.mutation(0.2)
+        child2.mutation(0.2)
 
     #    print("Parent 1: ")
     #    print(parent1.bins)
@@ -282,13 +282,19 @@ class Organism(object):
 
         random_bin = random.randint(0, 2)
         random_index = random.randint(0,bin_length-1)
+        random_bin2 = random.randint(0, 2)
+        random_index2 = random.randint(0, bin_length - 1)
 
-        random_number_replacement = random.randint(-9, -9)
+        temp_bin = self.bins[random_bin][random_index]
+        self.bins[random_bin][random_index] = self.bins[random_bin2][random_index2]
+        self.bins[random_bin2][random_index2] = temp_bin
 
-        bin_to_change = self.bins[random_bin]
+        random_number_replacement = random.randint(-9, 9)
+
+        #bin_to_change = self.bins[random_bin]
 
         # add in the random number
-        bin_to_change[random_index] = random_number_replacement
+        #bin_to_change[random_index] = random_number_replacement
 
         return True
 
@@ -464,7 +470,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0.5, 6, nums, timelimit)
+        bestSolution = geneticAlgorithm(0.05, 100, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
