@@ -10,7 +10,7 @@ import time
 ELITISM = 0.75 # out of 1
 POPULATION_SIZE = 60# >0
 
-MUTATION_RATE = 100 # out of 100
+MUTATION_RATE = .01
 
 FACTOR = 0.976
 
