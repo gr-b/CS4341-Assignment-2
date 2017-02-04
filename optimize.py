@@ -132,8 +132,8 @@ def getOffspring(flatlist1, flatlist2, cutpoint):
 
 def breedOrganisms(population, newPopulation, popSize, nums):
     while len(newPopulation) < popSize:
-        parent1 = randomSelection(population)#random.choice(population)#randomSelection(population)
-        parent2 = randomSelection(population)#random.choice(population)#randomSelection(population)
+        parent1 = random.choice(population)#randomSelection(population)
+        parent2 = random.choice(population)#randomSelection(population)
         while parent2 is parent1:
             parent2 = randomSelection(population)
         flatList1 = [y for x in parent1.bins for y in x]
