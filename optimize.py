@@ -7,26 +7,12 @@ import copy
 import time
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-ELITISM = 0.75# out of 1
-POPULATION_SIZE = 20# >0
-=======
-ELITISM = 0.75 # out of 1
-POPULATION_SIZE = 60# >0
->>>>>>> parent of c04ba68... For real this time
-
-MUTATION_RATE = .01
-
-FACTOR = 0.95
-=======
 ELITISM = 0.7 # out of 1
 POPULATION_SIZE = 120# >0
 
 MUTATION_RATE = .01 
 
 FACTOR = 0.3
->>>>>>> origin/master
 
 
 def getFromFile(filename):
@@ -34,6 +20,19 @@ def getFromFile(filename):
     nums = list(map(int, file.read().split()))
     file.close()
     return nums
+
+def listSwap(flatList, index1, index2):
+    temp = flatList[index1]
+    flatList[index1] = flatList[index2]
+    flatList[index2] = temp
+
+def mutate(flatList, prob):
+    i = 0
+    length = len(flatList)
+    for i in range(length):
+        if(random.random() < prob):
+            randIndex = random.randrange(0, length)
+            listSwap(flatList, i, randIndex)
 
 # Randomly assign the numbers in the given list to buckets
 # added deep copy so that original list is not deleted
@@ -117,7 +116,7 @@ def randomSelection(population):
         minScore = min(org.score, minScore)
     offset = 0
     if(minScore < 0):
-        offset = abs(minScore)
+        offset = abs(minScore) + 1
     for org in population:
         total += org.score + offset
     randPos = random.randint(0, total)
@@ -133,7 +132,7 @@ def unflattenOrganism(flatlist):
     bins = [flatlist[0:oneThirdList], flatlist[oneThirdList:2*oneThirdList], flatlist[2*oneThirdList:3*oneThirdList]]
     return Organism(bins, 0)
 
-def getOffspring(flatlist1, flatlist2, cutpoint):
+def getOffspring(flatlist1, flatlist2, cutpoint, mRate):
     childList = []
     freq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     i = 0
@@ -147,12 +146,12 @@ def getOffspring(flatlist1, flatlist2, cutpoint):
         if(freq[num+9] > 0):
             childList.append(num)
             freq[num+9] -= 1
+    mutate(childList, mRate)    
     org = unflattenOrganism(childList)
-    org.mutation(MUTATION_RATE)
     org.score = scoreBins(org.bins)
     return org
 
-def breedOrganisms(population, newPopulation, popSize, nums):
+def breedOrganisms(population, newPopulation, popSize, nums, mRate):
     while len(newPopulation) < popSize:
         parent1 = randomSelection(population)#random.choice(population)#randomSelection(population)
         parent2 = randomSelection(population)#random.choice(population)#randomSelection(population)
@@ -162,11 +161,11 @@ def breedOrganisms(population, newPopulation, popSize, nums):
         flatList2 = [y for x in parent2.bins for y in x]
 
         cutpoint = random.randrange(0, len(flatList1))
-        newPopulation.append(getOffspring(flatList1, flatList2, cutpoint))
-        newPopulation.append(getOffspring(flatList2, flatList1, cutpoint))
+        newPopulation.append(getOffspring(flatList1, flatList2, cutpoint, mRate))
+        newPopulation.append(getOffspring(flatList2, flatList1, cutpoint, mRate))
     return newPopulation
 
-def geneticAlgorithm(elite, popSize, nums, timeLimit):
+def geneticAlgorithm(elite, popSize, nums, timeLimit, mRate):
     startTime = time.time()
     population = []
     elitism = math.ceil(elite * popSize)
@@ -190,14 +189,12 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         #    print(org.score)
         if j % 5 == 0:
             print("Generation" + str(j) + ":--> " + str(scoreBins(population[0].bins)))
-        population = breedOrganisms(population, newPopulation, popSize, nums)
+        population = breedOrganisms(population, newPopulation, popSize, nums, mRate)
         
     population.sort(key = operator.attrgetter('score'), reverse=True)
     print("Generations: " + str(j))
     print([org.score for org in population])
     return population[0].bins
-
-
 
 class Organism(object):
     def __init__(self, bins, score):
@@ -205,36 +202,6 @@ class Organism(object):
         self.score = score
         
     def mutation(self, mutationProbability):
-        """
-        Mutation does random swaps between bins, similar to hill climbing
-
-        :param mutation: the probability for the mutation
-        :return: True/False if the mutation succeeded
-        """
-        """## if random variable is less than the mutationProbability, then grab a random number from a random bin
-        ## if the random variable is not less, dont do anything
-
-        # determine if the mutation can be moved
-        random_probability = random.random()
-        if not random_probability < mutationProbability:
-            return False
-
-        # now grab a random index in a random bin, and pick a random value from -9 to -9
-        bin_length = len(self.bins[0])
-        num_bins = 3
-
-        random_bin = random.randint(0, 2)
-        random_index = random.randint(0,bin_length-1)
-
-        random_number_replacement = random.randint(-9, -9)
-
-        bin_to_change = self.bins[random_bin]
-
-        # add in the random number
-        bin_to_change[random_index] = random_number_replacement
-
-        return True"""
-
         if random.randrange(0,100) < mutationProbability:
             #print("MUTATION")
             sourceBin = random.choice(self.bins)
@@ -420,7 +387,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(ELITISM, POPULATION_SIZE, nums, timelimit)
+        bestSolution = geneticAlgorithm(ELITISM, POPULATION_SIZE, nums, timelimit, MUTATION_RATE)
     else:
         print("Incorrect algorithm name given")
         exit()
