@@ -126,7 +126,7 @@ def getOffspring(flatlist1, flatlist2, cutpoint):
             childList.append(num)
             freq[num+9] -= 1
     org = unflattenOrganism(childList)
-    org.mutation(100)
+    org.mutation(10)
     org.score = scoreBins(org.bins)
     return org
 
@@ -399,7 +399,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0.02, 50, nums, timelimit)
+        bestSolution = geneticAlgorithm(0.5, 100, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
