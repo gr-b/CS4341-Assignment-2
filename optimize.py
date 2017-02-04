@@ -147,13 +147,48 @@ def breedOrganisms(population, newPopulation, popSize, nums):
         print("Child 2 frequency: ")
         print child2Frequency
         i = 0
+        tooManyList1 = []
+        tooManyList2 = []
+        tooFewList1 = []
+        tooFewList2 = []
         while i < 20:
+            if child1Frequency[i] < 0:
+                tooFewList1.append(i-10)
+            if child2Frequency[i] < 0:
+                tooFewList2.append(i-10)
             if child1Frequency[i] > 0:
-                replaceNum = i + 10
-                for num in child1List:
-                    if num == replaceNum:
-                        pass
+                tooManyList1.append(i-10)
+            if child2Frequency[i] > 0:
+                tooManyList2.append(i-10)
             i += 1
+        print("Too few list 1: " + str(tooFewList1))
+        print("Too few list 2: " + str(tooFewList2))
+        print("Too many list 1: " + str(tooManyList1))
+        print("Too many list 2: " + str(tooManyList2))
+        for (j, item) in enumerate(child1List):
+            if item in tooManyList1:
+                child1List[j] = tooFewList1.pop()
+                tooManyList1.remove(item)
+        for (j, item) in enumerate(child2List):
+            if item in tooManyList2:
+                child2List[j] = tooFewList2.pop()
+                tooManyList2.remove(item)
+
+        numFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        child1Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        child2Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for item in nums:
+            numFrequency[item+10] += 1
+        for item in child1List:
+            child1Frequency[item+10] += 1
+        for item in child2List:
+            child2Frequency[item+10] += 1
+        i = 0
+        while i < 20:
+            child1Frequency[i] -= numFrequency[i]
+            child2Frequency[i] -= numFrequency[i]
+            i += 1
+
         print("Child 1 frequency: ")
         print child1Frequency
         print("Child 2 frequency: ")
