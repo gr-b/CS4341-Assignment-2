@@ -7,6 +7,14 @@ import copy
 import time
 
 
+ELITISM = 0.75 # out of 1
+POPULATION_SIZE = 60# >0
+
+MUTATION_RATE = 100 # out of 100
+
+FACTOR = 0.976
+
+
 def getFromFile(filename):
     file = open(filename,"r")
     nums = list(map(int, file.read().split()))
@@ -126,7 +134,7 @@ def getOffspring(flatlist1, flatlist2, cutpoint):
             childList.append(num)
             freq[num+9] -= 1
     org = unflattenOrganism(childList)
-    org.mutation(10)
+    org.mutation(MUTATION_RATE)
     org.score = scoreBins(org.bins)
     return org
 
@@ -172,8 +180,7 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         
     population.sort(key = operator.attrgetter('score'), reverse=True)
     print("Generations: " + str(j))
-    for org in population:
-        print(org.score)
+    print([org.score for org in population])
     return population[0].bins
 
 
@@ -214,7 +221,7 @@ class Organism(object):
 
         return True"""
 
-        if random.randint(0,100) < mutationProbability:
+        if random.randrange(0,100) < mutationProbability:
             #print("MUTATION")
             sourceBin = random.choice(self.bins)
             destBin = random.choice(self.bins)
@@ -399,7 +406,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0.5, 100, nums, timelimit)
+        bestSolution = geneticAlgorithm(ELITISM, POPULATION_SIZE, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
