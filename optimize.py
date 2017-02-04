@@ -17,13 +17,10 @@ def getFromFile(filename):
 # added deep copy so that original list is not deleted
 def putInBins(numbers):
     bins = [[],[],[]]
-    new_numbers = copy.deepcopy(numbers)
+    random.shuffle(numbers)
     i = 0
-    while len(new_numbers) > 0:
-        selection = random.randint(0,len(new_numbers)-1)
-        #print( i%3, selection, len(numbers))
-        bins[i % 3].append(new_numbers[selection])
-        new_numbers.pop(selection)
+    while(i < len(numbers)):
+        bins[i%3].append(numbers[i])
         i += 1
     return bins
 
@@ -115,23 +112,20 @@ def randomSelection(population):
             randScore -= org.score
 
 def getOffspring(flatlist1, flatlist2, cutpoint):
-    flatlist1 = copy.copy(flatlist2)
-    flatlist2 = copy.copy(flatlist2)
-
-    offspring = []
+    childList = []
+    freq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     i = 0
-    for value in flatlist1:
+    for num in flatlist1:
+        if(i < cutpoint):
+            childList.append(num)
+        else:
+            freq[num+9] += 1
         i += 1
-        if(i > cutpoint):
-            break
-        offspring.append(value)
-        flatlist1.pop(i)
-        flatlist2.remove(value)
-
-    # Put all remaining values in flatlist2 into flatlist1
-    flatlist1 += flatlist2
-    return flatlist1
-
+    for num in flatlist2:
+        if(freq[num+9] > 0):
+            childList.append(num)
+            freq[num+9] -= 1
+    return childList
 
 def breedOrganisms(population, newPopulation, popSize, nums):
     while len(newPopulation) < popSize:
@@ -144,7 +138,8 @@ def breedOrganisms(population, newPopulation, popSize, nums):
 
         cutpoint = random.randrange(0, len(flatList1))
         newPopulation.append(getOffspring(flatList1, flatList2, cutpoint))
-        newPopulation.append(getOffSpring(flatList2, flatList1, cutpoint))
+        newPopulation.append(getOffspring(flatList2, flatList1, cutpoint))
+    return newPopulation
 
 
 
@@ -242,8 +237,8 @@ def breedOrganisms2(population, newPopulation, popSize, nums):
 
         child1 = Organism(child1Bins, scoreBins(child1Bins))
         child2 = Organism(child2Bins, scoreBins(child2Bins))
-        child1.mutation(0.2)
-        child2.mutation(0.2)
+        child1.mutation(0.5)
+        child2.mutation(0.5)
 
     #    print("Parent 1: ")
     #    print(parent1.bins)
@@ -270,7 +265,7 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         anOrg = Organism(putInBins(nums), 0)
         anOrg.score = scoreBins(anOrg.bins)
         population.append(anOrg)
-
+    print("Initial build done: " + str(time.time() - startTime))
     while (time.time() - startTime < timeLimit):
         newPopulation = []
         population.sort(key = operator.attrgetter('score'))
@@ -503,7 +498,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0.05, 20, nums, timelimit)
+        bestSolution = geneticAlgorithm(0.05, 150, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
