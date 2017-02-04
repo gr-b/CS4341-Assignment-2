@@ -7,12 +7,21 @@ import copy
 import time
 
 
+<<<<<<< HEAD
 ELITISM = 0.75# out of 1
 POPULATION_SIZE = 20# >0
 
 MUTATION_RATE = .01 
 
 FACTOR = 0.95
+=======
+ELITISM = 0.7 # out of 1
+POPULATION_SIZE = 120# >0
+
+MUTATION_RATE = .01 
+
+FACTOR = 0.3
+>>>>>>> origin/master
 
 
 def getFromFile(filename):
