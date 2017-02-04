@@ -125,7 +125,9 @@ def getOffspring(flatlist1, flatlist2, cutpoint):
         if(freq[num+9] > 0):
             childList.append(num)
             freq[num+9] -= 1
-    return unflattenOrganism(childList)
+    org = unflattenOrganism(childList)
+    org.mutation(5)
+    return org
 
 def breedOrganisms(population, newPopulation, popSize, nums):
     while len(newPopulation) < popSize:
@@ -141,122 +143,6 @@ def breedOrganisms(population, newPopulation, popSize, nums):
         newPopulation.append(getOffspring(flatList2, flatList1, cutpoint))
     return newPopulation
 
-
-
-def breedOrganisms2(population, newPopulation, popSize, nums):
-    while len(newPopulation) < popSize:
-        parent1 = randomSelection(population)
-        parent2 = randomSelection(population)
-        while parent2 is parent1:
-            parent2 = randomSelection(population)
-        flatList1 = [y for x in parent1.bins for y in x]
-        flatList2 = [y for x in parent2.bins for y in x]
-        cutpoint = random.randrange(0, len(flatList1))
-
-        child1List = flatList1[0:cutpoint] + flatList2[cutpoint:len(flatList2)]
-        child2List = flatList2[0:cutpoint] + flatList1[cutpoint:len(flatList1)]
-
-        numFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        child1Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        child2Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        for item in nums:
-            numFrequency[item+10] += 1
-        for item in child1List:
-            child1Frequency[item+10] += 1
-        for item in child2List:
-            child2Frequency[item+10] += 1
-        i = 0
-        while i < 20:
-            child1Frequency[i] -= numFrequency[i]
-            child2Frequency[i] -= numFrequency[i]
-            i += 1
-        #print("Child 1 frequency: ")
-        #print(child1Frequency)
-        #print("Child 2 frequency: ")
-        #print(child2Frequency)
-        i = 0
-        tooManyList1 = []
-        tooManyList2 = []
-        tooFewList1 = []
-        tooFewList2 = []
-        while i < 20:
-            if child1Frequency[i] < 0:
-                while(child1Frequency[i] < 0):
-                    tooFewList1.append(i-10)
-                    child1Frequency[i] += 1
-            if child2Frequency[i] < 0:
-                while(child2Frequency[i] < 0):
-                    tooFewList2.append(i-10)
-                    child2Frequency[i] += 1
-            if child1Frequency[i] > 0:
-                while(child1Frequency[i] > 0):
-                    tooManyList1.append(i-10)
-                    child1Frequency[i] -= 1
-            if child2Frequency[i] > 0:
-                while(child2Frequency[i] > 0):
-                    tooManyList2.append(i-10)
-                    child2Frequency[i] -= 1
-            i += 1
-        #print("Too few list 1: " + str(tooFewList1))
-        #print("Too few list 2: " + str(tooFewList2))
-        #print("Too many list 1: " + str(tooManyList1))
-        #print("Too many list 2: " + str(tooManyList2))
-        for (j, item) in enumerate(child1List):
-            if item in tooManyList1 and len(tooFewList1) > 0:
-                child1List[j] = tooFewList1.pop()
-                tooManyList1.remove(item)
-        for (j, item) in enumerate(child2List):
-            if item in tooManyList2 and len(tooFewList2) > 0:
-                child2List[j] = tooFewList2.pop()
-                tooManyList2.remove(item)
-
-        # numFrequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        # child1Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        # child2Frequency = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        # for item in nums:
-        #     numFrequency[item+10] += 1
-        # for item in child1List:
-        #     child1Frequency[item+10] += 1
-        # for item in child2List:
-        #     child2Frequency[item+10] += 1
-        # i = 0
-        # while i < 20:
-        #     child1Frequency[i] -= numFrequency[i]
-        #     child2Frequency[i] -= numFrequency[i]
-        #     i += 1
-
-        #print("Child 1 frequency: ")
-        #print(child1Frequency)
-        #print("Child 2 frequency: ")
-        #print(child2Frequency)
-
-        oneThirdList = int(len(child1List) / 3)
-
-        child1Bins = [child1List[0:oneThirdList],child1List[oneThirdList:2*oneThirdList],child1List[2*oneThirdList:3*oneThirdList]]
-        child2Bins = [child2List[0:oneThirdList],child2List[oneThirdList:2*oneThirdList],child2List[2*oneThirdList:3*oneThirdList]]
-
-        child1 = Organism(child1Bins, scoreBins(child1Bins))
-        child2 = Organism(child2Bins, scoreBins(child2Bins))
-        child1.mutation(0.5)
-        child2.mutation(0.5)
-
-    #    print("Parent 1: ")
-    #    print(parent1.bins)
-    #    print("Parent 2: ")
-    #    print(parent2.bins)
-    #    print("Child 1: ")
-    #    print(child1.bins)
-    #    print("Child 2: ")
-    #    print(child2.bins)
-
-
-
-
-        newPopulation.append(child1)
-        newPopulation.append(child2)
-    return newPopulation
-
-
 def geneticAlgorithm(elite, popSize, nums, timeLimit):
     startTime = time.time()
     population = []
@@ -269,8 +155,7 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
     while (time.time() - startTime < timeLimit):
         j += 1   
         newPopulation = []
-        population.sort(key = operator.attrgetter('score'))
-        population.reverse()
+        population.sort(key = operator.attrgetter('score'), reverse=True)
         #for org in population:
         #    print(org.score)
         i = 0
@@ -302,7 +187,7 @@ class Organism(object):
         :param mutation: the probability for the mutation
         :return: True/False if the mutation succeeded
         """
-        ## if random variable is less than the mutationProbability, then grab a random number from a random bin
+        """## if random variable is less than the mutationProbability, then grab a random number from a random bin
         ## if the random variable is not less, dont do anything
 
         # determine if the mutation can be moved
@@ -316,22 +201,28 @@ class Organism(object):
 
         random_bin = random.randint(0, 2)
         random_index = random.randint(0,bin_length-1)
-        random_bin2 = random.randint(0, 2)
-        random_index2 = random.randint(0, bin_length - 1)
 
-        temp_bin = self.bins[random_bin][random_index]
-        self.bins[random_bin][random_index] = self.bins[random_bin2][random_index2]
-        self.bins[random_bin2][random_index2] = temp_bin
+        random_number_replacement = random.randint(-9, -9)
 
-        random_number_replacement = random.randint(-9, 9)
-
-        #bin_to_change = self.bins[random_bin]
+        bin_to_change = self.bins[random_bin]
 
         # add in the random number
-        #bin_to_change[random_index] = random_number_replacement
+        bin_to_change[random_index] = random_number_replacement
 
-        return True
+        return True"""
 
+        if random.randint(0,100) < mutationProbability:
+            #print("MUTATION")
+            sourceBin = random.choice(self.bins)
+            destBin = random.choice(self.bins)
+
+            sourceI = random.randrange(0, len(sourceBin))
+            destI = random.randrange(0, len(destBin))
+
+            swap(sourceBin, sourceI, destBin, destI)
+            return True
+        return False
+            
 
 def getAllBinScores(bins):
     """
@@ -500,12 +391,12 @@ def main():
     start = time.time()
     bestSolution = None
     if algorithm == "annealing":
-        #bestSolution = simAnneal(nums, timelimit, 0.95)
-        trial(nums, timelimit, float(arguments[4]), float(arguments[5]))
+        bestSolution = simAnneal(nums, timelimit, 0.95)
+        #trial(nums, timelimit, float(arguments[4]), float(arguments[5]))
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0.2, 150, nums, timelimit)
+        bestSolution = geneticAlgorithm(0.02, 300, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
