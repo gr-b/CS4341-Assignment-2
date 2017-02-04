@@ -142,10 +142,10 @@ def breedOrganisms(population, newPopulation, popSize, nums):
             child1Frequency[i] -= numFrequency[i]
             child2Frequency[i] -= numFrequency[i]
             i += 1
-        print("Child 1 frequency: ")
-        print(child1Frequency)
-        print("Child 2 frequency: ")
-        print(child2Frequency)
+        #print("Child 1 frequency: ")
+        #print(child1Frequency)
+        #print("Child 2 frequency: ")
+        #print(child2Frequency)
         i = 0
         tooManyList1 = []
         tooManyList2 = []
@@ -169,10 +169,10 @@ def breedOrganisms(population, newPopulation, popSize, nums):
                     tooManyList2.append(i-10)
                     child2Frequency[i] -= 1
             i += 1
-        print("Too few list 1: " + str(tooFewList1))
-        print("Too few list 2: " + str(tooFewList2))
-        print("Too many list 1: " + str(tooManyList1))
-        print("Too many list 2: " + str(tooManyList2))
+        #print("Too few list 1: " + str(tooFewList1))
+        #print("Too few list 2: " + str(tooFewList2))
+        #print("Too many list 1: " + str(tooManyList1))
+        #print("Too many list 2: " + str(tooManyList2))
         for (j, item) in enumerate(child1List):
             if item in tooManyList1 and len(tooFewList1) > 0:
                 child1List[j] = tooFewList1.pop()
@@ -197,10 +197,10 @@ def breedOrganisms(population, newPopulation, popSize, nums):
             child2Frequency[i] -= numFrequency[i]
             i += 1
 
-        print("Child 1 frequency: ")
-        print(child1Frequency)
-        print("Child 2 frequency: ")
-        print(child2Frequency)
+        #print("Child 1 frequency: ")
+        #print(child1Frequency)
+        #print("Child 2 frequency: ")
+        #print(child2Frequency)
 
         oneThirdList = int(len(child1List) / 3)
 
@@ -242,15 +242,15 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         newPopulation = []
         population.sort(key = operator.attrgetter('score'))
         population.reverse()
-        for org in population:
-            print(org.score)
+        #for org in population:
+        #    print(org.score)
         i = 0
         while (i < elitism) and (i < len(population)):
             newPopulation.append(population[i])
             i += 1
-        print("Population list (pre-breeding):")
-        for org in population:
-            print(org.score)
+        #print("Population list (pre-breeding):")
+        #for org in population:
+        #    print(org.score)
         population = breedOrganisms(population, newPopulation, popSize, nums)
     return population[0].bins
 
