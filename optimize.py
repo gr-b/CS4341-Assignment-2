@@ -7,12 +7,12 @@ import copy
 import time
 
 
-ELITISM = 0.675# out of 1
-POPULATION_SIZE = 60# >0
+ELITISM = 0.7 # out of 1
+POPULATION_SIZE = 120# >0
 
 MUTATION_RATE = .01 
 
-FACTOR = 0.976
+FACTOR = 0.3
 
 
 def getFromFile(filename):
@@ -382,7 +382,7 @@ def main():
     start = time.time()
     bestSolution = None
     if algorithm == "annealing":
-        bestSolution = simAnneal(nums, timelimit, 0.95)
+        bestSolution = simAnneal(nums, timelimit, FACTOR)
         #trial(nums, timelimit, float(arguments[4]), float(arguments[5]))
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
