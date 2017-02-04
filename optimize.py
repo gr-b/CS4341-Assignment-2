@@ -94,21 +94,21 @@ def scoreBins(bins):
 def randomSelection(population):
     popCopy = copy.deepcopy(population)
     minScore = abs(popCopy[-1].score)+1
-    print("Random selection's list")
+    #print("Random selection's list")
     for org in popCopy:
         org.score += minScore
-        print(org.score)
+    #    print(org.score)
 
     totalFitness = 0
     for org in popCopy:
         totalFitness += org.score
     randScore = random.randrange(0, totalFitness)
-    print("Total fitness: " + str(totalFitness))
-    print("Random number: " + str(randScore))
+    #print("Total fitness: " + str(totalFitness))
+    #print("Random number: " + str(randScore))
     runningFitness = 0
     for org in popCopy:
         if org.score >= randScore:
-            print("Chose organism with score " + str(org.score))
+    #        print("Chose organism with score " + str(org.score))
             org.score -= minScore
             return org
         else:
@@ -142,10 +142,10 @@ def breedOrganisms(population, newPopulation, popSize, nums):
             child1Frequency[i] -= numFrequency[i]
             child2Frequency[i] -= numFrequency[i]
             i += 1
-        print("Child 1 frequency: ")
-        print child1Frequency
-        print("Child 2 frequency: ")
-        print child2Frequency
+    #    print("Child 1 frequency: ")
+    #    print child1Frequency
+    #    print("Child 2 frequency: ")
+    #    print child2Frequency
         i = 0
         tooManyList1 = []
         tooManyList2 = []
@@ -153,24 +153,32 @@ def breedOrganisms(population, newPopulation, popSize, nums):
         tooFewList2 = []
         while i < 20:
             if child1Frequency[i] < 0:
-                tooFewList1.append(i-10)
+                while(child1Frequency[i] < 0):
+                    tooFewList1.append(i-10)
+                    child1Frequency[i] += 1
             if child2Frequency[i] < 0:
-                tooFewList2.append(i-10)
+                while(child2Frequency[i] < 0):
+                    tooFewList2.append(i-10)
+                    child2Frequency[i] += 1
             if child1Frequency[i] > 0:
-                tooManyList1.append(i-10)
+                while(child1Frequency[i] > 0):
+                    tooManyList1.append(i-10)
+                    child1Frequency[i] -= 1
             if child2Frequency[i] > 0:
-                tooManyList2.append(i-10)
+                while(child2Frequency[i] > 0):
+                    tooManyList2.append(i-10)
+                    child2Frequency[i] -= 1
             i += 1
         print("Too few list 1: " + str(tooFewList1))
         print("Too few list 2: " + str(tooFewList2))
         print("Too many list 1: " + str(tooManyList1))
         print("Too many list 2: " + str(tooManyList2))
         for (j, item) in enumerate(child1List):
-            if item in tooManyList1:
+            if item in tooManyList1 and len(tooFewList1) > 0:
                 child1List[j] = tooFewList1.pop()
                 tooManyList1.remove(item)
         for (j, item) in enumerate(child2List):
-            if item in tooManyList2:
+            if item in tooManyList2 and len(tooFewList2) > 0:
                 child2List[j] = tooFewList2.pop()
                 tooManyList2.remove(item)
 
@@ -189,10 +197,10 @@ def breedOrganisms(population, newPopulation, popSize, nums):
             child2Frequency[i] -= numFrequency[i]
             i += 1
 
-        print("Child 1 frequency: ")
-        print child1Frequency
-        print("Child 2 frequency: ")
-        print child2Frequency
+    #    print("Child 1 frequency: ")
+    #    print child1Frequency
+    #    print("Child 2 frequency: ")
+    #    print child2Frequency
 
         oneThirdList = int(len(child1List) / 3)
 
@@ -201,17 +209,17 @@ def breedOrganisms(population, newPopulation, popSize, nums):
 
         child1 = Organism(child1Bins, scoreBins(child1Bins))
         child2 = Organism(child2Bins, scoreBins(child2Bins))
-        child1.mutation(0.1)
-        child2.mutation(0.1)
+        child1.mutation(0.5)
+        child2.mutation(0.5)
 
-        print("Parent 1: ")
-        print(parent1.bins)
-        print("Parent 2: ")
-        print(parent2.bins)
-        print("Child 1: ")
-        print(child1.bins)
-        print("Child 2: ")
-        print(child2.bins)
+    #    print("Parent 1: ")
+    #    print(parent1.bins)
+    #    print("Parent 2: ")
+    #    print(parent2.bins)
+    #    print("Child 1: ")
+    #    print(child1.bins)
+    #    print("Child 2: ")
+    #    print(child2.bins)
 
 
 
@@ -238,7 +246,7 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
             print(org.score)
         i = 0
         while (i < elitism) and (i < len(population)):
-            newPopulation[i] = population[i]
+            newPopulation.append(population[i])
             i += 1
         print("Population list (pre-breeding):")
         for org in population:
@@ -455,13 +463,13 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0, 6, nums, timelimit)
+        bestSolution = geneticAlgorithm(0.5, 6, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
 
-    #print(bestSolution)
-    #print("Score: " + str(scoreBins(bestSolution)))
+    print(bestSolution)
+    print("Score: " + str(scoreBins(bestSolution)))
 
 
 if __name__ == '__main__':
