@@ -89,27 +89,26 @@ def scoreBins(bins):
    return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
 
 def randomSelection(population):
-    popCopy = copy.deepcopy(population)
-    minScore = abs(popCopy[-1].score)+1
-    #print("Random selection's list")
-    for org in popCopy:
-        org.score += minScore
-    #    print(org.score)
+    minScore = population[0].score
+    total = 0
+    for org in population:
+        minScore = min(org.score, minScore)
+    if(minScore < 0):
+        offset = abs(minScore)
+        for org in population:
+            total += org.score + offset
+    randPos = random.randint(0, total)
+    i = 0
+    while(population[i].score + offset < randPos):
+        randPos -= population[i].score + offset
+        i += 1
+    return population[i]
 
-    totalFitness = 0
-    for org in popCopy:
-        totalFitness += org.score
-    randScore = random.randrange(0, totalFitness)
-    #print("Total fitness: " + str(totalFitness))
-    #print("Random number: " + str(randScore))
-    runningFitness = 0
-    for org in popCopy:
-        if org.score >= randScore:
-    #        print("Chose organism with score " + str(org.score))
-            org.score -= minScore
-            return org
-        else:
-            randScore -= org.score
+def unflattenOrganism(flatlist):
+    flatlist = copy.copy(flatlist)
+    oneThirdList = int(len(flatlist) / 3)
+    bins = [flatlist[0:oneThirdList], flatlist[oneThirdList:2*oneThirdList], flatlist[2*oneThirdList:3*oneThirdList]]
+    return Organism(bins, scoreBins(bins))
 
 def getOffspring(flatlist1, flatlist2, cutpoint):
     childList = []
@@ -125,7 +124,7 @@ def getOffspring(flatlist1, flatlist2, cutpoint):
         if(freq[num+9] > 0):
             childList.append(num)
             freq[num+9] -= 1
-    return childList
+    return unflattenOrganism(childList)
 
 def breedOrganisms(population, newPopulation, popSize, nums):
     while len(newPopulation) < popSize:
@@ -265,7 +264,6 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         anOrg = Organism(putInBins(nums), 0)
         anOrg.score = scoreBins(anOrg.bins)
         population.append(anOrg)
-    print("Initial build done: " + str(time.time() - startTime))
     while (time.time() - startTime < timeLimit):
         newPopulation = []
         population.sort(key = operator.attrgetter('score'))
