@@ -7,7 +7,7 @@ import copy
 import time
 
 
-ELITISM = 0.25 # out of 1
+ELITISM = 0.75 # out of 1
 POPULATION_SIZE = 60# >0
 
 MUTATION_RATE = 100 # out of 100
