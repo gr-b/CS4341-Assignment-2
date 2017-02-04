@@ -93,10 +93,11 @@ def randomSelection(population):
     total = 0
     for org in population:
         minScore = min(org.score, minScore)
+    offset = 0
     if(minScore < 0):
         offset = abs(minScore)
-        for org in population:
-            total += org.score + offset
+    for org in population:
+        total += org.score + offset
     randPos = random.randint(0, total)
     i = 0
     while(population[i].score + offset < randPos):
