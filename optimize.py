@@ -125,7 +125,9 @@ def getOffspring(flatlist1, flatlist2, cutpoint):
         if(freq[num+9] > 0):
             childList.append(num)
             freq[num+9] -= 1
-    return unflattenOrganism(childList)
+    org = unflattenOrganism(childList)
+    org.mutation(5)
+    return org
 
 def breedOrganisms(population, newPopulation, popSize, nums):
     while len(newPopulation) < popSize:
@@ -302,7 +304,7 @@ class Organism(object):
         :param mutation: the probability for the mutation
         :return: True/False if the mutation succeeded
         """
-        ## if random variable is less than the mutationProbability, then grab a random number from a random bin
+        """## if random variable is less than the mutationProbability, then grab a random number from a random bin
         ## if the random variable is not less, dont do anything
 
         # determine if the mutation can be moved
@@ -324,8 +326,20 @@ class Organism(object):
         # add in the random number
         bin_to_change[random_index] = random_number_replacement
 
-        return True
+        return True"""
 
+        if random.randint(0,100) < mutationProbability:
+            #print("MUTATION")
+            sourceBin = random.choice(self.bins)
+            destBin = random.choice(self.bins)
+
+            sourceI = random.randrange(0, len(sourceBin))
+            destI = random.randrange(0, len(destBin))
+
+            swap(sourceBin, sourceI, destBin, destI)
+            return True
+        return False
+            
 
 def getAllBinScores(bins):
     """
@@ -494,12 +508,12 @@ def main():
     start = time.time()
     bestSolution = None
     if algorithm == "annealing":
-        #bestSolution = simAnneal(nums, timelimit, 0.95)
-        trial(nums, timelimit, float(arguments[4]), float(arguments[5]))
+        bestSolution = simAnneal(nums, timelimit, 0.95)
+        #trial(nums, timelimit, float(arguments[4]), float(arguments[5]))
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0.2, 150, nums, timelimit)
+        bestSolution = geneticAlgorithm(0.02, 300, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
