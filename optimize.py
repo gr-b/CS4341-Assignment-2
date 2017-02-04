@@ -490,6 +490,7 @@ def main():
     #best_solution = hillClimbing(bins, nums, time_limit=timelimit)
     #print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
 
+    start = time.time()
     bestSolution = None
     if algorithm == "annealing":
         #bestSolution = simAnneal(nums, timelimit, 0.95)
@@ -501,10 +502,10 @@ def main():
     else:
         print("Incorrect algorithm name given")
         exit()
-
-    print(bestSolution)
+    
+    #print(bestSolution)
     print("Score: " + str(scoreBins(bestSolution)))
-
+    print("Elapsed: " + str(time.time()-start))
 
 if __name__ == '__main__':
     main()
