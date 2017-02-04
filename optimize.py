@@ -114,8 +114,41 @@ def randomSelection(population):
         else:
             randScore -= org.score
 
+def getOffspring(flatlist1, flatlist2, cutpoint):
+    flatlist1 = copy.copy(flatlist2)
+    flatlist2 = copy.copy(flatlist2)
+
+    offspring = []
+    i = 0
+    for value in flatlist1:
+        i += 1
+        if(i > cutpoint):
+            break
+        offspring.append(value)
+        flatlist1.pop(i)
+        flatlist2.remove(value)
+
+    # Put all remaining values in flatlist2 into flatlist1
+    flatlist1 += flatlist2
+    return flatlist1
+
 
 def breedOrganisms(population, newPopulation, popSize, nums):
+    while len(newPopulation) < popSize:
+        parent1 = randomSelection(population)
+        parent2 = randomSelection(population)
+        while parent2 is parent1:
+            parent2 = randomSelection(population)
+        flatList1 = [y for x in parent1.bins for y in x]
+        flatList2 = [y for x in parent2.bins for y in x]
+
+        cutpoint = random.randrange(0, len(flatList1))
+        newPopulation.append(getOffspring(flatList1, flatList2, cutpoint))
+        newPopulation.append(getOffSpring(flatList2, flatList1, cutpoint))
+
+
+
+def breedOrganisms2(population, newPopulation, popSize, nums):
     while len(newPopulation) < popSize:
         parent1 = randomSelection(population)
         parent2 = randomSelection(population)
@@ -470,7 +503,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0.05, 100, nums, timelimit)
+        bestSolution = geneticAlgorithm(0.05, 20, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
