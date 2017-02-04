@@ -109,7 +109,7 @@ def unflattenOrganism(flatlist):
     flatlist = copy.copy(flatlist)
     oneThirdList = int(len(flatlist) / 3)
     bins = [flatlist[0:oneThirdList], flatlist[oneThirdList:2*oneThirdList], flatlist[2*oneThirdList:3*oneThirdList]]
-    return Organism(bins, scoreBins(bins))
+    return Organism(bins, 0)
 
 def getOffspring(flatlist1, flatlist2, cutpoint):
     childList = []
@@ -126,7 +126,8 @@ def getOffspring(flatlist1, flatlist2, cutpoint):
             childList.append(num)
             freq[num+9] -= 1
     org = unflattenOrganism(childList)
-    org.mutation(5)
+    org.mutation(100)
+    org.score = scoreBins(org.bins)
     return org
 
 def breedOrganisms(population, newPopulation, popSize, nums):
@@ -169,8 +170,10 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
             print("Generation" + str(j) + ":--> " + str(scoreBins(population[0].bins)))
         population = breedOrganisms(population, newPopulation, popSize, nums)
         
-        
+    population.sort(key = operator.attrgetter('score'), reverse=True)
     print("Generations: " + str(j))
+    for org in population:
+        print(org.score)
     return population[0].bins
 
 
@@ -396,7 +399,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0.02, 300, nums, timelimit)
+        bestSolution = geneticAlgorithm(0.02, 50, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
