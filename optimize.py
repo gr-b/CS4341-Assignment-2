@@ -129,8 +129,8 @@ def getOffspring(flatlist1, flatlist2, cutpoint):
 
 def breedOrganisms(population, newPopulation, popSize, nums):
     while len(newPopulation) < popSize:
-        parent1 = randomSelection(population)
-        parent2 = randomSelection(population)
+        parent1 = randomSelection(population)#random.choice(population)#randomSelection(population)
+        parent2 = randomSelection(population)#random.choice(population)#randomSelection(population)
         while parent2 is parent1:
             parent2 = randomSelection(population)
         flatList1 = [y for x in parent1.bins for y in x]
@@ -265,7 +265,9 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         anOrg = Organism(putInBins(nums), 0)
         anOrg.score = scoreBins(anOrg.bins)
         population.append(anOrg)
+    j = 0
     while (time.time() - startTime < timeLimit):
+        j += 1   
         newPopulation = []
         population.sort(key = operator.attrgetter('score'))
         population.reverse()
@@ -278,7 +280,12 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit):
         #print("Population list (pre-breeding):")
         #for org in population:
         #    print(org.score)
+        if j % 5 == 0:
+            print("Generation" + str(j) + ":--> " + str(scoreBins(population[0].bins)))
         population = breedOrganisms(population, newPopulation, popSize, nums)
+        
+        
+    print("Generations: " + str(j))
     return population[0].bins
 
 
@@ -498,7 +505,7 @@ def main():
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        bestSolution = geneticAlgorithm(0.05, 150, nums, timelimit)
+        bestSolution = geneticAlgorithm(0.2, 150, nums, timelimit)
     else:
         print("Incorrect algorithm name given")
         exit()
