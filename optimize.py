@@ -143,9 +143,9 @@ def breedOrganisms(population, newPopulation, popSize, nums):
             child2Frequency[i] -= numFrequency[i]
             i += 1
         print("Child 1 frequency: ")
-        print child1Frequency
+        print(child1Frequency)
         print("Child 2 frequency: ")
-        print child2Frequency
+        print(child2Frequency)
         i = 0
         tooManyList1 = []
         tooManyList2 = []
@@ -190,9 +190,9 @@ def breedOrganisms(population, newPopulation, popSize, nums):
             i += 1
 
         print("Child 1 frequency: ")
-        print child1Frequency
+        print(child1Frequency)
         print("Child 2 frequency: ")
-        print child2Frequency
+        print(child2Frequency)
 
         oneThirdList = int(len(child1List) / 3)
 
@@ -425,6 +425,7 @@ def trial(nums, timelimit, min, max):
     while(factor <= max):
         print("Factor: " + str(factor) + " Score: " + str(scoreBins(simAnneal(nums, timelimit, factor))))
         factor += step
+
 
 def main():
     arguments = sys.argv
