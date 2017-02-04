@@ -214,7 +214,7 @@ class Organism(object):
 
         return True"""
 
-        if random.randint(0,100) < mutationProbability:
+        if random.randrange(0,100) < mutationProbability:
             #print("MUTATION")
             sourceBin = random.choice(self.bins)
             destBin = random.choice(self.bins)
