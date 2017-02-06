@@ -7,23 +7,41 @@ import copy
 import time
 
 
+ELITISM = 0.75 # out of 1
+POPULATION_SIZE = 20# >0
+
+MUTATION_RATE = .01 
+
+FACTOR = 0.95
+
+
 def getFromFile(filename):
     file = open(filename,"r")
     nums = list(map(int, file.read().split()))
     file.close()
     return nums
 
+def listSwap(flatList, index1, index2):
+    temp = flatList[index1]
+    flatList[index1] = flatList[index2]
+    flatList[index2] = temp
+
+def mutate(flatList, prob):
+    i = 0
+    length = len(flatList)
+    for i in range(length):
+        if(random.random() < prob):
+            randIndex = random.randrange(0, length)
+            listSwap(flatList, i, randIndex)
+
 # Randomly assign the numbers in the given list to buckets
 # added deep copy so that original list is not deleted
 def putInBins(numbers):
     bins = [[],[],[]]
-    new_numbers = copy.deepcopy(numbers)
+    random.shuffle(numbers)
     i = 0
-    while len(new_numbers) > 0:
-        selection = random.randint(0,len(new_numbers)-1)
-        #print( i%3, selection, len(numbers))
-        bins[i % 3].append(new_numbers[selection])
-        new_numbers.pop(selection)
+    while(i < len(numbers)):
+        bins[i%3].append(numbers[i])
         i += 1
     return bins
 
@@ -89,63 +107,114 @@ def scoreBin3(bin3):
     return score
 
 def scoreBins(bins):
-   print("First bin: " + str(scoreBin1(bins[0])))
-   print("Second bin: " + str(scoreBin2(bins[1])))
-   print("Third bin: " + str(scoreBin3(bins[2])))
    return scoreBin1(bins[0]) + scoreBin2(bins[1]) + scoreBin3(bins[2])
 
-def geneticAlgorithm(elite, popSize, nums):
+def randomSelection(population):
+    minScore = population[0].score
+    total = 0
+    for org in population:
+        minScore = min(org.score, minScore)
+    offset = 0
+    if(minScore < 0):
+        offset = abs(minScore) + 1
+    for org in population:
+        total += org.score + offset
+    randPos = random.randint(0, total)
+    i = 0
+    while(population[i].score + offset < randPos):
+        randPos -= population[i].score + offset
+        i += 1
+    return population[i]
+
+def unflattenOrganism(flatlist):
+    flatlist = copy.copy(flatlist)
+    oneThirdList = int(len(flatlist) / 3)
+    bins = [flatlist[0:oneThirdList], flatlist[oneThirdList:2*oneThirdList], flatlist[2*oneThirdList:3*oneThirdList]]
+    return Organism(bins, 0)
+
+def getOffspring(flatlist1, flatlist2, cutpoint, mRate):
+    childList = []
+    freq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    i = 0
+    for num in flatlist1:
+        if(i < cutpoint):
+            childList.append(num)
+        else:
+            freq[num+9] += 1
+        i += 1
+    for num in flatlist2:
+        if(freq[num+9] > 0):
+            childList.append(num)
+            freq[num+9] -= 1
+    mutate(childList, mRate)    
+    org = unflattenOrganism(childList)
+    org.score = scoreBins(org.bins)
+    return org
+
+def breedOrganisms(population, newPopulation, popSize, nums, mRate):
+    while len(newPopulation) < popSize:
+        parent1 = randomSelection(population)#random.choice(population)#randomSelection(population)
+        parent2 = randomSelection(population)#random.choice(population)#randomSelection(population)
+        while parent2 is parent1:
+            parent2 = randomSelection(population)
+        flatList1 = [y for x in parent1.bins for y in x]
+        flatList2 = [y for x in parent2.bins for y in x]
+
+        cutpoint = random.randrange(0, len(flatList1))
+        newPopulation.append(getOffspring(flatList1, flatList2, cutpoint, mRate))
+        newPopulation.append(getOffspring(flatList2, flatList1, cutpoint, mRate))
+    return newPopulation
+
+def geneticAlgorithm(elite, popSize, nums, timeLimit, mRate):
+    startTime = time.time()
     population = []
-    for org in popSize:
+    elitism = math.ceil(elite * popSize)
+    for org in range(popSize):
         anOrg = Organism(putInBins(nums), 0)
         anOrg.score = scoreBins(anOrg.bins)
         population.append(anOrg)
-    newPopulation = []
-    population.sort(key = operator.attrgetter('score'))
-    elitism = math.ceiling(elite * popSize)
-    i = 0
-    while (i < elitism) and (i < population.len()):
-        newPopulation[i] =  population[i]
-        i += 1
-
-# randomly mutates, random swap between bins. Once you change anything in the organism, recalculate the score for it
+    j = 0
+    while (time.time() - startTime < timeLimit):
+        j += 1   
+        newPopulation = []
+        population.sort(key = operator.attrgetter('score'), reverse=True)
+        #for org in population:
+        #    print(org.score)
+        i = 0
+        while (i < elitism) and (i < len(population)):
+            newPopulation.append(population[i])
+            i += 1
+        #print("Population list (pre-breeding):")
+        #for org in population:
+        #    print(org.score)
+        if j % 5 == 0:
+            #print("Generation" + str(j) + ":--> " + str(scoreBins(population[0].bins)))
+            pass
+        population = breedOrganisms(population, newPopulation, popSize, nums, mRate)
+        
+    population.sort(key = operator.attrgetter('score'), reverse=True)
+    #print("Generations: " + str(j))
+    #print([org.score for org in population])
+    return population[0].bins
 
 class Organism(object):
     def __init__(self, bins, score):
         self.bins = bins
         self.score = score
-
+        
     def mutation(self, mutationProbability):
-        """
-        Mutation does random swaps between bins, similar to hill climbing
+        if random.randrange(0,100) < mutationProbability:
+            #print("MUTATION")
+            sourceBin = random.choice(self.bins)
+            destBin = random.choice(self.bins)
 
-        :param mutation: the probability for the mutation
-        :return: True/False if the mutation succeeded
-        """
-        ## if random variable is less than the mutationProbability, then grab a random number from a random bin
-        ## if the random variable is not less, dont do anything
+            sourceI = random.randrange(0, len(sourceBin))
+            destI = random.randrange(0, len(destBin))
 
-        # determine if the mutation can be moved
-        random_probability = random.random()
-        if not random_probability < mutationProbability:
-            return False
-
-        # now grab a random index in a random bin, and pick a random value from -9 to -9
-        bin_length = len(self.bins[0])
-        num_bins = 3
-
-        random_bin = random.randint(1, 3)
-        random_index = random.randint(0,bin_length-1)
-
-        random_number_replacement = random.randint(-9, -9)
-
-        bin_to_change = self.bins[random_bin]
-
-        # add in the random number
-        bin_to_change[random_index] = random_number_replacement
-
-        return True
-
+            swap(sourceBin, sourceI, destBin, destI)
+            return True
+        return False
+            
 
 def getAllBinScores(bins):
     """
@@ -209,10 +278,10 @@ def tryMove(newScore, oldScore, temperature):
         prob = math.exp(float(newScore-oldScore) / temperature)
         return random.random() < prob;
 
-def getTemp(time): #placeholder implementation
-    return math.pow(0.2, time)
+def getTemp(time, decreaseFactor): #placeholder implementation
+    return math.pow(decreaseFactor, time)
 
-def simAnneal(numbers, timeLimit):
+def simAnneal(numbers, timeLimit, decreaseFactor):
     #setup
     startTime = time.time()
     bestSolution = None
@@ -224,11 +293,10 @@ def simAnneal(numbers, timeLimit):
         currentScore = scoreBins(bins)
         if(bestSolution == None):
             bestSolution = copy.deepcopy(bins)
-        tries = 0
         t = 1
-        temperature = getTemp(t)
+        temperature = getTemp(t, decreaseFactor)
         if(t > 0):
-            while(tries < 100 and temperature > 0 and time.time() - startTime < timeLimit): #this restart condition is subject to change
+            while(time.time() - startTime < timeLimit and temperature > 0): #this restart condition is subject to change
                 #pick two random locations
                 locations = [] #[first_bin, first_bin_index, second_bin, second_bin_index]
                 locations.append(random.randrange(0, 3))
@@ -245,16 +313,14 @@ def simAnneal(numbers, timeLimit):
 
                 #try to make the move
                 if(tryMove(score, currentScore, temperature)):
-                    #if it works, reset tries, update currentScore
-                    tries = 0
+                    #if it works, update currentScore
                     currentScore = score
                 else:
-                    #if it fails, swap it back and increment tries
+                    #if it fails, swap it back
                     swap(bins[locations[0]], locations[1], bins[locations[2]], locations[3])
-                    tries += 1
                 #Update temperature
                 t += 1
-                temperature = getTemp(t)
+                temperature = getTemp(t, decreaseFactor)
         #if the new solution is better that the old best solution, replace the old best
         if(currentScore > scoreBins(bestSolution)):
             bestSolution = copy.deepcopy(bins)
@@ -284,13 +350,21 @@ def getRandomNumInBin(bins):
     # val = bin[rand_int]
     return index
 
+def trial(nums, timelimit, min, max):
+    factor = min
+    step = (max-min)/10
+    while(factor <= max):
+        print("Factor: " + str(factor) + " Score: " + str(scoreBins(simAnneal(nums, timelimit, factor))))
+        factor += step
+
 
 def main():
     arguments = sys.argv
 
     if len(arguments) != 4:
         print("Invalid Format, try: python optimize.py [hill, annealing, ga] [filename.txt] [seconds]")
-        #exit()
+        exit()
+        pass
 
     algorithm = arguments[1]
     filename = arguments[2]
@@ -306,19 +380,23 @@ def main():
     #best_solution = hillClimbing(bins, nums, time_limit=timelimit)
     #print "Caclualted again score %s. " % (sum(getAllBinScores(best_solution)))
 
+    start = time.time()
     bestSolution = None
     if algorithm == "annealing":
-        bestSolution = simAnneal(nums, timelimit)
+        bestSolution = simAnneal(nums, timelimit, FACTOR)
+        #trial(nums, timelimit, float(arguments[4]), float(arguments[5]))
     elif algorithm == "hill":
         bestSolution = hillClimbing(nums, timelimit)
     elif algorithm == "ga":
-        print("Soon.")
+        bestSolution = geneticAlgorithm(ELITISM, POPULATION_SIZE, nums, timelimit, MUTATION_RATE)
     else:
         print("Incorrect algorithm name given")
-
-    print(bestSolution)
+        exit()
+    
+    #print(bestSolution)
+    print("Best Answer: " + str(bestSolution))
     print("Score: " + str(scoreBins(bestSolution)))
-
+    print("Elapsed: " + str(time.time()-start))
 
 if __name__ == '__main__':
     main()
