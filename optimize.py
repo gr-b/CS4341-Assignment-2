@@ -7,12 +7,12 @@ import copy
 import time
 
 
-ELITISM = 0.75# out of 1
-POPULATION_SIZE = 20# >0
+ELITISM = 0.7 # out of 1
+POPULATION_SIZE = 120# >0
 
 MUTATION_RATE = .01 
 
-FACTOR = 0.95
+FACTOR = 0.3
 
 
 def getFromFile(filename):
