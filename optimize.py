@@ -7,12 +7,12 @@ import copy
 import time
 
 
-ELITISM = 0.7 # out of 1
-POPULATION_SIZE = 120# >0
+ELITISM = 0.75 # out of 1
+POPULATION_SIZE = 20# >0
 
 MUTATION_RATE = .01 
 
-FACTOR = 0.3
+FACTOR = 0.95
 
 
 def getFromFile(filename):
@@ -188,12 +188,13 @@ def geneticAlgorithm(elite, popSize, nums, timeLimit, mRate):
         #for org in population:
         #    print(org.score)
         if j % 5 == 0:
-            print("Generation" + str(j) + ":--> " + str(scoreBins(population[0].bins)))
+            #print("Generation" + str(j) + ":--> " + str(scoreBins(population[0].bins)))
+            pass
         population = breedOrganisms(population, newPopulation, popSize, nums, mRate)
         
     population.sort(key = operator.attrgetter('score'), reverse=True)
-    print("Generations: " + str(j))
-    print([org.score for org in population])
+    #print("Generations: " + str(j))
+    #print([org.score for org in population])
     return population[0].bins
 
 class Organism(object):
@@ -361,8 +362,8 @@ def main():
     arguments = sys.argv
 
     if len(arguments) != 4:
-        #print("Invalid Format, try: python optimize.py [hill, annealing, ga] [filename.txt] [seconds]")
-        #exit()
+        print("Invalid Format, try: python optimize.py [hill, annealing, ga] [filename.txt] [seconds]")
+        exit()
         pass
 
     algorithm = arguments[1]
@@ -393,6 +394,7 @@ def main():
         exit()
     
     #print(bestSolution)
+    print("Best Answer: " + str(bestSolution))
     print("Score: " + str(scoreBins(bestSolution)))
     print("Elapsed: " + str(time.time()-start))
 
